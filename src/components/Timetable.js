@@ -5,14 +5,15 @@ import {
   StyleSheet,
   TouchableOpacity
 } from 'react-native'
-import Icon from 'react-native-vector-icons/FontAwesome'
 import apiUtils from '../network/apiUtils'
 import URLS from '../network/urls'
 import asyncStorage from '../storage/asyncStorage'
 import moment from 'moment'
-import GestureRecognizer, {swipeDirections} from 'react-native-swipe-gestures'
+import GestureRecognizer from 'react-native-swipe-gestures'
+import {createStackNavigator} from 'react-navigation'
+import WorkerDay from './WorkerDay';
 
-export default class Timetable extends React.Component {
+class Timetable extends React.Component {
   constructor(props) {
     super(props)
     this.renderDays.bind(this)
@@ -168,7 +169,7 @@ export default class Timetable extends React.Component {
   }
 
   _fakePress () {
-    console.log('here[1]')
+    this.props.navigation.navigate('detailsPage')
   }
 
   _onSwipeRight () {
@@ -291,3 +292,22 @@ const styles = StyleSheet.create({
     fontSize: 12
   }
 })
+
+export default timetableStackNavigator = createStackNavigator(
+  {
+    timetablePage: {
+      screen: Timetable,
+      navigationOptions: {
+        header: null
+      }
+    },
+    detailsPage: {
+      screen: WorkerDay,
+      navigationOptions: {
+        title: 'Рабочий день'
+      }
+      // path: 'workerday/:workerDayId'
+    },
+    initialRouteName: 'timetablePage'
+  }
+)

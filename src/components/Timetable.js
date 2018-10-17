@@ -124,19 +124,28 @@ class Timetable extends React.Component {
       if (isExistWorkerDay) {
         let type = isExistWorkerDay.day.type
         if (type === 'W') {
+          /*
+            [Год, Месяц, День, Время Начала(либо тип , если выходной/отпуск), Время конца (либо ничего)]
+          */
           arrayOfDays[weekDay].push([
+            dayInCalendar.format('YYYY'),
+            dayInCalendar.format('MM'),
             dayInCalendar.format('D'),
             isExistWorkerDay.day.dttm_work_start.slice(0, -3),
             isExistWorkerDay.day.dttm_work_end.slice(0, -3),
           ])
         } else {
           arrayOfDays[weekDay].push([
+            dayInCalendar.format('YYYY'),
+            dayInCalendar.format('MM'),
             dayInCalendar.format('D'),
             this.state.workTypes[type]
           ])
         }
       } else {
         arrayOfDays[weekDay].push([
+          dayInCalendar.format('YYYY'),
+          dayInCalendar.format('MM'),
           dayInCalendar.format('D'),
           '-'
         ])
@@ -152,12 +161,12 @@ class Timetable extends React.Component {
                 <TouchableOpacity
                   style={styles.day}
                   key={j}
-                  onPress={() => this._fakePress()}
+                  onPress={() => this._getWorkerDay(day)}
                 >
                   <Text style={styles.day_text}>
-                    {day[0]}{'\n'}
-                    {day[1]}{'\n'}
-                    {day[2]}
+                    {day[2]}{'\n'}
+                    {day[3]}{'\n'}
+                    {day[4]}
                   </Text>
                 </TouchableOpacity>
               )
@@ -168,8 +177,12 @@ class Timetable extends React.Component {
     })
   }
 
-  _fakePress () {
-    this.props.navigation.navigate('detailsPage')
+  _getWorkerDay (day) {
+    if (day[3] !== '-') {
+      this.props.navigation.navigate('detailsPage', {
+        date: [day[2], day[1], day[0]].join('.')
+      })
+    }
   }
 
   _onSwipeRight () {
@@ -295,19 +308,18 @@ const styles = StyleSheet.create({
 
 export default timetableStackNavigator = createStackNavigator(
   {
+    detailsPage: {
+      screen: WorkerDay,
+      navigationOptions: {
+        title: 'Пожелания'
+      }
+    },
     timetablePage: {
       screen: Timetable,
       navigationOptions: {
         header: null
       }
-    },
-    detailsPage: {
-      screen: WorkerDay,
-      navigationOptions: {
-        title: 'Рабочий день'
-      }
-      // path: 'workerday/:workerDayId'
-    },
-    initialRouteName: 'timetablePage'
+    }, 
+    initialRouteName: 'detailsPage'
   }
 )

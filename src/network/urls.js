@@ -14,7 +14,8 @@ export const URLS = {
         //cashier
         workerInfo: API_ENDPOINT + 'timetable/cashier/get_cashier_info',
         setWorkerInfo: API_ENDPOINT + 'timetable/cashier/set_cashier_info',
-        getWorkerTimetable: API_ENDPOINT + 'timetable/cashier/get_cashier_timetable'
+        getWorkerTimetable: API_ENDPOINT + 'timetable/cashier/get_cashier_timetable',
+        getWorkerDay: API_ENDPOINT + 'timetable/cashier/get_worker_day'
     }
 }
 

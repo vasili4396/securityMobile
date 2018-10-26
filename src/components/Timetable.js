@@ -69,6 +69,9 @@ class Timetable extends React.Component {
     let fromDate = mondayOfPrevMonth === null ? currentDate : mondayOfPrevMonth
     let toDate = sundayOfNextMonth === null ? currentDate.endOf('month') : sundayOfNextMonth
 
+    let differenceInDays = Math.floor(moment.duration(toDate.diff(moment(fromDate).subtract(1, 'days'))).asDays())
+    if (differenceInDays < 7 * 6) toDate.add(7 * 6 - differenceInDays, 'days')
+
     return [fromDate, toDate]
   }
 
@@ -163,8 +166,10 @@ class Timetable extends React.Component {
                   key={j}
                   onPress={() => this._getWorkerDay(day)}
                 >
+                  <View>
+                    <Text style={{marginBottom: 1, fontSize: 12, textAlign: 'center'}}>{day[2]}{'\n'}</Text>
+                  </View>
                   <Text style={styles.day_text}>
-                    {day[2]}{'\n'}
                     {day[3]}{'\n'}
                     {day[4]}
                   </Text>
@@ -250,7 +255,7 @@ class Timetable extends React.Component {
 
 const styles = StyleSheet.create({
   header: {
-    backgroundColor: '#329BCB',
+    backgroundColor: '#6bbf5f',
     flexDirection: 'row',
     padding: 30
   },
@@ -295,9 +300,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F5F5F5',
     padding: 3,
-    height: 80,
-    margin: 1,
-    paddingTop: 20
+    height: 80
   },
   day_text: {
     textAlign: 'center',
@@ -313,7 +316,7 @@ export default timetableStackNavigator = createStackNavigator(
       navigationOptions: {
         header: null
       }
-    }, 
+    },
     detailsPage: {
       screen: WorkerDay,
       navigationOptions: {

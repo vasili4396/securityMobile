@@ -4,8 +4,9 @@ import {
   View,
   TextInput,
   StyleSheet,
-  KeyboardAvoidingView,
+  ImageBackground,
   TouchableOpacity,
+  Alert
 } from 'react-native'
 import apiUtils from '../network/apiUtils'
 import URLS from '../network/urls'
@@ -29,21 +30,38 @@ export default class Login extends React.Component {
 				this.props.navigation.navigate('App')
 			})
 			.catch(err => {
-				alert(err)
+				if (err.code === 400) Alert.alert('', 'Неправильный логин, либо пароль.')
+				else { alert(err) }
 			})
 	}
 
 	render() {
 		return (
-			<KeyboardAvoidingView behavior='padding' style={styles.wrapper}>
-				<View style={styles.container}>
-					<Text style={styles.header}>-Login-</Text>
+			<View style={{flex: 1}}>
+				<ImageBackground
+					source={require('../../assets/backgroundImage.png')}
+					style={styles.imageContainer}
+					resizeMode='cover'
+				>
+					<View style={{flexDirection: 'row'}}>
+						<Text style={styles.imageBackgroundText}>Mind </Text>
+						<Text style={StyleSheet.flatten([styles.imageBackgroundText, {color: 'red'}])}>&</Text>
+						<Text style={styles.imageBackgroundText}> Machine</Text>
+					</View>
+					<Text style={styles.imageBackgroundTextLower}>
+						Кабинет сотрудника
+					</Text>
+				</ImageBackground>
+				<View style={styles.dataContainer}>
+					<View style={styles.textInputContainer}>
 						<TextInput
 							style={styles.textInput}
 							placeholder='Логин'
 							onChangeText={ (username) => this.setState({username})}
 							underlineColorAndroid='transparent'
 						/>
+					</View>
+					<View style={styles.textInputContainer}>
 						<TextInput
 							style={styles.textInput}
 							secureTextEntry={true}
@@ -51,46 +69,63 @@ export default class Login extends React.Component {
 							onChangeText={ (password) => this.setState({password})}
 							underlineColorAndroid='transparent'
 						/>
-						<TouchableOpacity
-							style={styles.btn}
-							onPress={() => this.login()}
-						>
-							<Text>login</Text>
-						</TouchableOpacity>
 					</View>
-			</KeyboardAvoidingView>
+					<TouchableOpacity
+						style={styles.btn}
+						onPress={() => this.login()}
+					>
+						<Text style={styles.loginButtonText}>Войти</Text>
+					</TouchableOpacity>
+				</View>
+			</View>
 		)
 	}
 }
 
 const styles = StyleSheet.create({
-		wrapper: {
-			flex: 1
-		},
-		container: {
-			flex: 1,
-			alignItems: 'center',
-			justifyContent: 'center',
-			backgroundColor: '#2896d3',
-			paddingLeft: 40,
-			paddingRight: 40,
-		},
-		header: {
-			fontSize: 24,
-			marginBottom: 60,
-			color: '#fff',
-			fontWeight: 'bold',
-		},
-		textInput: {
-			alignSelf: 'stretch',
-			padding: 16,
-			marginBottom: 20,
-			backgroundColor: '#fff'
-		},
-		btn: {
-			alignSelf: 'stretch',
-			backgroundColor: '#01c853',
-			padding: 20,
-			alignItems: 'center'
-		}
+	imageContainer: {
+		width: '100%',
+		flex: 7,
+		alignItems: 'center',
+    	justifyContent:'center',
+	},
+	imageBackgroundText: {
+		textAlign: 'center',
+		fontSize: 40,
+		color: '#fff',
+		fontWeight: 'bold'
+	},
+	imageBackgroundTextLower: {
+		textAlign: 'center',
+		fontSize: 20,
+		color: '#fff'
+	},
+	dataContainer: {
+		flex: 3
+	},
+	textInputContainer: {
+		flex: 2,
+		margin: 20,
+		alignSelf: 'stretch',
+		backgroundColor: '#fff'	,
+		borderBottomWidth: 2,
+		borderBottomColor: '#b2b2b2'
+	},
+	textInput: {
+		fontSize: 20
+	},
+	btn: {
+		flex: 3,
+		marginBottom: 10,
+		marginLeft: 50,
+		marginRight: 50,
+		borderRadius: 5,
+		backgroundColor: '#6bbf5f',
+		alignItems: 'center',
+		justifyContent: 'center'
+	},
+	loginButtonText: {
+		fontSize: 20,
+		color: '#fff'
+	}
 })

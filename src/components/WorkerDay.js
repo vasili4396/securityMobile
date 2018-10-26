@@ -4,7 +4,8 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
-  TextInput
+  TextInput,
+  Alert
 } from 'react-native'
 import URLS from '../network/urls'
 import apiUtils from '../network/apiUtils'
@@ -105,6 +106,21 @@ export default class WorkerDay extends React.Component {
     this._hideEndTimePicker()
   }
 
+  _trySaveNewWorkerDay = () => {
+    Alert.alert(
+      '',
+      'Вы действительно хотите сохранить изменения?',
+      [
+        {text: 'Отменить'},
+        {text: 'Да', onPress: () => this._saveWorkerDay()},
+      ]
+    )
+  }
+
+  _saveWorkerDay = () => {
+    console.log('success')
+  }
+
   render () {
     const state = this.state
     let weekdayNum = (moment(state.date, 'D.MM.YYYY').weekday() + 6) % 7
@@ -173,12 +189,9 @@ export default class WorkerDay extends React.Component {
               style={styles.personalPreferencesInput}
               placeholder='Введите текст пожаления'
               returnKeyType='none'
+              underlineColorAndroid='transparent'
 							onChangeText={ (wishText) => this.setState({wishText})}
 						/>
-          </View>
-
-          <View style={styles.saveButtonContainer}>
-            
           </View>
 
           <HideableView 
@@ -189,7 +202,7 @@ export default class WorkerDay extends React.Component {
               <TouchableOpacity onPress={this._showStartTimePicker}>
                 <Text style={{fontSize: 14}}>Время начала</Text>
                 <Text style={styles.timePreferences}>
-                  {state.workStartTime ? state.workStartTime.slice(0, -3): ''}
+                  {state.workStartTime ? state.workStartTime.slice(0, -3): 'Не указано'}
                 </Text>
               </TouchableOpacity>
               <DateTimePicker
@@ -206,7 +219,7 @@ export default class WorkerDay extends React.Component {
               <TouchableOpacity onPress={this._showEndTimePicker}>
                 <Text style={{fontSize: 14}}>Время окончания</Text>
                 <Text style={styles.timePreferences}>
-                  {state.workEndTime ? state.workEndTime.slice(0, -3): ''}
+                  {state.workEndTime ? state.workEndTime.slice(0, -3): 'Не указано'}
                 </Text>
               </TouchableOpacity>
               <DateTimePicker
@@ -221,6 +234,14 @@ export default class WorkerDay extends React.Component {
               />
             </View>
           </HideableView>
+
+          <View style={styles.saveButtonContainer}>
+            <TouchableOpacity onPress={this._trySaveNewWorkerDay} style={styles.saveButton}>
+              <Text style={styles.saveButtonText}>
+                Сохранить изменения
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
       )
     } else {
@@ -264,25 +285,18 @@ const styles = StyleSheet.create({
     color: '#505050'
   },
   timePreferencesContainer: {
-    backgroundColor: '#D3D3D3',
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
-    borderTopWidth: 1,
-    padding: 20,
-    borderColor: '#151515'
+    padding: 30
   },
   timesContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around'
   },
   timePreferences: {
-    fontSize: 30,
+    fontSize: 26,
     textDecorationLine: 'underline'
   },
   personalPreferencesContainer: {
-    paddingTop: 60
+    paddingTop: 30
   },
   personalPreferencesInput: {
     margin: 15,
@@ -290,5 +304,23 @@ const styles = StyleSheet.create({
     height: 60,
     borderBottomWidth: 1,
     borderBottomColor: '#000000'
+  },
+  saveButtonContainer: {
+    position: 'absolute',
+    bottom: 40,
+    left: 10,
+    right: 10,
+    alignSelf: 'stretch'
+  },
+  saveButton: {
+    height: 60,
+    backgroundColor: '#6bbf5f',
+    borderRadius: 5
+  },
+  saveButtonText: {
+    fontSize: 20,
+    padding: 15,
+    alignSelf: 'center',
+    color: '#fff'
   }
 })

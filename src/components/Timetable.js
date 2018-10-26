@@ -78,8 +78,8 @@ class Timetable extends React.Component {
       worker_id: JSON.stringify([userId]),
       shop_id: shopId,
       format: 'raw',
-      from_dt: extremeDates[0].format('DD.MM.YYYY'),
-      to_dt: extremeDates[1].format('DD.MM.YYYY')
+      from_dt: extremeDates[0].format(dateFormat),
+      to_dt: extremeDates[1].format(dateFormat)
     })
       .then(res => res.data[userId].days)
       .then(res => {
@@ -120,7 +120,7 @@ class Timetable extends React.Component {
         arrayOfDays.push([])
       }
       let dayInCalendar = fromDate.add(1, 'days')
-      isExistWorkerDay = workerDays.find(oneDay => oneDay.day.dt === dayInCalendar.format('DD.MM.YYYY'))
+      isExistWorkerDay = workerDays.find(oneDay => oneDay.day.dt === dayInCalendar.format(dateFormat))
       if (isExistWorkerDay) {
         let type = isExistWorkerDay.day.type
         if (type === 'W') {
@@ -308,18 +308,18 @@ const styles = StyleSheet.create({
 
 export default timetableStackNavigator = createStackNavigator(
   {
-    detailsPage: {
-      screen: WorkerDay,
-      navigationOptions: {
-        title: 'Пожелания'
-      }
-    },
     timetablePage: {
       screen: Timetable,
       navigationOptions: {
         header: null
       }
     }, 
+    detailsPage: {
+      screen: WorkerDay,
+      navigationOptions: {
+        title: 'Пожелания'
+      }
+    },
     initialRouteName: 'detailsPage'
   }
 )

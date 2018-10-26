@@ -19,12 +19,11 @@ export default class WorkerDay extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      date: '5.07.2018',//this.props.navigation.state.params.date,
+      date: this.props.navigation.state.params.date,
       selectedWorkType: null,
       workStartTime: null,
       workEndTime: null,
-      isModalVisible: false,
-      isStartTimePickerVisible: false,
+      isStartTimePickerVifsible: false,
       isEndTimePickerVisible: false,
       wishText: '',
       weekdays: [
@@ -88,14 +87,13 @@ export default class WorkerDay extends React.Component {
     this.setState({selectedWorkType: Object.keys(types)[(currentIndex + 1) % Object.keys(types).length]})
   }
 
-  _toggleModal = () => this.setState({ isModalVisible: !this.state.isModalVisible })
-
   _showStartTimePicker = () => this.setState({ isStartTimePickerVisible: true })
 
   _hideStartTimePicker = () => this.setState({ isStartTimePickerVisible: false })
 
   _handleStartTimePicked = (time) => {
-    this._hideStartTimePicker();
+    this.setState({ workStartTime: moment(time, timeFormat).format(timeFormat) })
+    this._hideStartTimePicker()
   }
 
   _showEndTimePicker = () => this.setState({ isEndTimePickerVisible: true })
@@ -103,17 +101,18 @@ export default class WorkerDay extends React.Component {
   _hideEndTimePicker = () => this.setState({ isEndTimePickerVisible: false })
 
   _handleEndTimePicked = (time) => {
-    this._hideEndTimePicker();
+    this.setState({ workEndTime: moment(time, timeFormat).format(timeFormat) })
+    this._hideEndTimePicker()
   }
 
   render () {
     const state = this.state
     let weekdayNum = (moment(state.date, 'D.MM.YYYY').weekday() + 6) % 7
-
     if (state.workerDay) {
       let todayDate = moment()
-      let workStartTime = moment(state.workStartTime, 'HH:mm:ss')
-      let workEndTime = moment(state.workEndTime, 'HH:mm:ss')
+      
+      let workStartTime = moment(state.workStartTime, timeFormat)
+      let workEndTime = moment(state.workEndTime, timeFormat)
       let workStartDateTime = new Date(
         todayDate.year(),
         todayDate.month(),
@@ -138,7 +137,7 @@ export default class WorkerDay extends React.Component {
           <View style={{padding: 20, alignItems: 'center'}}>
             <Text style={{fontSize: 14}}>Статус дня</Text>
           </View>
-            
+          
           <View style={styles.workDayType}>
             <View style={styles.leftButtonContainer}>
               <Icon.Button
@@ -169,37 +168,32 @@ export default class WorkerDay extends React.Component {
             <Text style={styles.tipStyleText}>Нажмите на стрелочку, чтобы изменить</Text>
           </View>
 
-          <View style={styles.personalPreferences}>
+          <View style={styles.personalPreferencesContainer}>
             <TextInput
-							// style={styles.textInput}
-							placeholder='Введите текст пожаления'
+              style={styles.personalPreferencesInput}
+              placeholder='Введите текст пожаления'
+              returnKeyType='none'
 							onChangeText={ (wishText) => this.setState({wishText})}
-							// underlineColorAndroid='transparent'
 						/>
           </View>
 
-          {/* <View>
-            <TouchableOpacity onPress={this._toggleModal}>
-              <Text style={{padding: 50}}>Show Modal</Text>
-            </TouchableOpacity>
-            <Modal
-              isVisible={this.state.selectedWorkType === 'W'}
-              backdropOpacity={0}
-              animationInTiming={700} // в миллисекундах
-              // onBackdropPress={() => this.setState({ isModalVisible: false })}
-            > */}
+          <View style={styles.saveButtonContainer}>
+            
+          </View>
 
           <HideableView 
-            style={styles.preferencesContainer}
-            hide={this.state.selectedWorkType !== 'W'}
+            style={styles.timePreferencesContainer}
+            hide={state.selectedWorkType !== 'W'}
           >
             <View style={styles.timesContainer}>
               <TouchableOpacity onPress={this._showStartTimePicker}>
                 <Text style={{fontSize: 14}}>Время начала</Text>
-                <Text style={styles.timePreferences}>{state.workStartTime.slice(0, -3)}</Text>
+                <Text style={styles.timePreferences}>
+                  {state.workStartTime ? state.workStartTime.slice(0, -3): ''}
+                </Text>
               </TouchableOpacity>
               <DateTimePicker
-                isVisible={this.state.isStartTimePickerVisible}
+                isVisible={state.isStartTimePickerVisible}
                 onConfirm={this._handleStartTimePicked}
                 onCancel={this._hideStartTimePicker}      
                 mode='time'
@@ -211,10 +205,12 @@ export default class WorkerDay extends React.Component {
 
               <TouchableOpacity onPress={this._showEndTimePicker}>
                 <Text style={{fontSize: 14}}>Время окончания</Text>
-                <Text style={styles.timePreferences}>{state.workEndTime.slice(0, -3)}</Text>
+                <Text style={styles.timePreferences}>
+                  {state.workEndTime ? state.workEndTime.slice(0, -3): ''}
+                </Text>
               </TouchableOpacity>
               <DateTimePicker
-                isVisible={this.state.isEndTimePickerVisible}
+                isVisible={state.isEndTimePickerVisible}
                 onConfirm={this._handleEndTimePicked}
                 onCancel={this._hideEndTimePicker}
                 date={workEndDateTime}
@@ -225,8 +221,6 @@ export default class WorkerDay extends React.Component {
               />
             </View>
           </HideableView>
-          {/* </View>
-          </Modal> */}
         </View>
       )
     } else {
@@ -269,7 +263,8 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#505050'
   },
-  preferencesContainer: {
+  timePreferencesContainer: {
+    backgroundColor: '#D3D3D3',
     position: 'absolute',
     left: 0,
     right: 0,
@@ -286,8 +281,14 @@ const styles = StyleSheet.create({
     fontSize: 30,
     textDecorationLine: 'underline'
   },
-  personalPreferences: {
-
+  personalPreferencesContainer: {
+    paddingTop: 60
+  },
+  personalPreferencesInput: {
+    margin: 15,
+    fontSize: 20,
+    height: 60,
+    borderBottomWidth: 1,
+    borderBottomColor: '#000000'
   }
-
 })

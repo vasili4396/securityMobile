@@ -40,13 +40,14 @@ export default class Login extends React.Component {
 					<Text style={styles.header}>-Login-</Text>
 						<TextInput
 							style={styles.textInput}
-							placeholder='Username'
+							placeholder='Логин'
 							onChangeText={ (username) => this.setState({username})}
 							underlineColorAndroid='transparent'
 						/>
 						<TextInput
 							style={styles.textInput}
-							placeholder='Password'
+							secureTextEntry={true}
+							placeholder='Пароль'
 							onChangeText={ (password) => this.setState({password})}
 							underlineColorAndroid='transparent'
 						/>

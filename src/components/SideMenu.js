@@ -3,31 +3,36 @@ import {
 	ScrollView,
 	Text,
 	Image,
-	StyleSheet
+	StyleSheet,
+	TouchableOpacity
 } from 'react-native'
+import { LinearGradient } from 'expo'
 import React, {Component} from 'react'
 import { createDrawerNavigator, NavigationActions } from 'react-navigation'
 import asyncStorage from '../storage/asyncStorage'
-import Icon from 'react-native-vector-icons/MaterialIcons'
+import Icon from 'react-native-vector-icons/FontAwesome'
 import ProfileScreen from './Profile'
 import SettingsScreen from './Settings'
 import PreferencesScreen from './Preferences'
 import TimetableScreen from './Timetable'
 import LogoutScreen from './Logout'
 
+const iconSize = 35
+
 class SideMenu extends Component {
 	constructor(props) {
 		super(props)
 		this.state = {
 			firstName: '',
-			lastName: ''
+			lastName: '',
+			group: ''
 		}
 		this._getUserInfo()	
 	}
 
 	_getUserInfo () {
     asyncStorage.getItem('user').then(userInfo => {
-      this.setState({firstName: userInfo.first_name, lastName: userInfo.last_name})
+      this.setState({firstName: userInfo.first_name, lastName: userInfo.last_name, group: userInfo.group})
     })
   }
 
@@ -48,26 +53,61 @@ class SideMenu extends Component {
 					style={styles.userAvatar}
 				>
 				</Image>
-				<Text style={styles.userFullName}>
-					{state.firstName + ' ' + state.lastName}
-				</Text>
+				<View>
+					<Text style={styles.userFullName}>{state.firstName + ' ' + state.lastName}</Text>
+					<Text style={styles.userGroup}>{userGroups[state.group]}</Text>
+				</View>
+				
 			</View>
 			<View style={styles.navigationMenuContainer}>
-				<Text style={styles.sectionHeadingStyle}>
-					Section 2
-				</Text>
-				<View style={styles.navSectionStyle}>
-					<Text style={styles.navItemStyle} onPress={this.navigateToScreen('Preferences')}>
-						Page2
+
+				<TouchableOpacity onPress={this.navigateToScreen('Timetable')} style={styles.menuItem}>
+					<View style={styles.iconContainer}>
+						<Icon name='calendar' size={iconSize} color={primaryColor}></Icon>
+					</View>
+					<Text style={styles.menuItemText} onPress={this.navigateToScreen('Timetable')}>
+						Расписание
 					</Text>
-					<Text style={styles.navItemStyle} onPress={this.navigateToScreen('Timetable')}>
-						Page3
+				</TouchableOpacity>
+
+				<TouchableOpacity onPress={this.navigateToScreen('Preferences')} style={styles.menuItem}>
+					<View style={styles.iconContainer}>
+					<Icon name='id-card' size={iconSize} color={primaryColor} ></Icon>
+					</View>
+					<Text style={styles.menuItemText}>
+						Пожелания на день
 					</Text>
-				</View>
+				</TouchableOpacity>
+
+				<TouchableOpacity onPress={this.navigateToScreen('Settings')} style={styles.menuItem}>
+					<View style={styles.iconContainer}>
+						<Icon name='cog' size={iconSize} color={primaryColor}></Icon>
+					</View>
+					<Text style={styles.menuItemText}>
+						Настройки
+					</Text>
+				</TouchableOpacity>
+
+				<TouchableOpacity onPress={this.navigateToScreen('Profile')} style={styles.menuItem}>
+					<View style={styles.iconContainer}>
+						<Icon name='user' size={iconSize} color={primaryColor}></Icon>
+					</View>
+					<Text style={styles.menuItemText}>
+						Профиль
+					</Text>
+				</TouchableOpacity>
+
 			</View>
-		  <View style={styles.footerContainer}>
-				<Text>This is my fixed footer</Text>
-		  </View>
+
+		  <TouchableOpacity onPress={this.navigateToScreen('Logout')} style={styles.menuItem}>
+				<View style={styles.iconContainer}>
+					<Icon name='sign-out' size={iconSize} color={primaryColor}></Icon>
+				</View>
+				<Text style={styles.menuItemText}>
+					Выйти
+				</Text>
+			</TouchableOpacity>
+
 		</View>
 	  )
 	}
@@ -75,8 +115,8 @@ class SideMenu extends Component {
 
 const styles = StyleSheet.create({
 	mainContainer: {
-		marginTop: 30,
-		flex: 1
+		flex: 1,
+		backgroundColor: '#888888'
 	},
 	userContainer: {
 		flex: 2,
@@ -85,38 +125,60 @@ const styles = StyleSheet.create({
 		alignItems: 'center'
 	},
 	userAvatar: {
-		height: 40,
-		width: 40
+		height: 50,
+		width: 50
 	},
 	userFullName: {
 		fontSize: 20,
 		marginLeft: 10
 	},
+	userGroup: {
+		fontSize: 16,
+		marginLeft: 10
+	},
 	navigationMenuContainer: {
 		flex: 10
 	},
+	menuItem: {
+		flexDirection: 'row',
+		paddingVertical: 15
+	},
+	iconContainer: {
+		alignItems: 'center',
+		justifyContent: 'center',
+		height: 50,
+		width: 60,
+		paddingLeft: 10
+	},
+	menuItemText: {
+		paddingLeft: 5,
+		paddingTop: 10,
+		fontSize: 22,
+		color: '#fff'
+	},
 	footerContainer: {
-		flex: 2
-	}
+		flex: 2,
+		paddingHorizontal: 10
+	},
 })
 
 export default createDrawerNavigator(
 	{
 		Timetable: {
-			screen: SideMenu
+			screen: TimetableScreen
 		},
-		// Preferences: {
-		// 	screen: PreferencesScreen
-		// },
-		// Profile: {
-		// 	screen: ProfileScreen
-		// },
-		// Settings: {
-		// 	screen: SettingsScreen
-		// },
-		// Logout: {
-		// 	screen: LogoutScreen
-		// }
+		Preferences: {
+			screen: PreferencesScreen
+		},
+		Profile: {
+			screen: ProfileScreen
+		},
+		Settings: {
+			screen: SettingsScreen
+		},
+		Logout: {
+			screen: LogoutScreen
+		}
 	},
 	{
 		contentComponent: SideMenu

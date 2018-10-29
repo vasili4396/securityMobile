@@ -7,8 +7,8 @@ import {
 export default class Profile extends React.Component {
   render() {
 		return (
-      <View >
-        <Text >Настройки</Text>
+      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+        <Text >Этот экран находится в разработке</Text>
       </View>	
 		)
   }

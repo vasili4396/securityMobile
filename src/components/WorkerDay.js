@@ -159,7 +159,7 @@ export default class WorkerDay extends React.Component {
               <Icon.Button
                 name='chevron-left'
                 size={30}
-                backgroundColor='#6bbf5f'
+                backgroundColor={primaryColor}
                 borderRadius={0}
                 onPress={() => this._prevWorkType()}
               >
@@ -172,7 +172,7 @@ export default class WorkerDay extends React.Component {
               <Icon.Button
                 name='chevron-right'
                 size={30}
-                backgroundColor='#6bbf5f'
+                backgroundColor={primaryColor}
                 borderRadius={0}
                 onPress={() => this._nextWorkType()}
               >
@@ -187,7 +187,8 @@ export default class WorkerDay extends React.Component {
           <View style={styles.personalPreferencesContainer}>
             <TextInput
               style={styles.personalPreferencesInput}
-              placeholder='Введите текст пожаления'
+              placeholder='Введите текст пожелания'
+              placeholderTextColor={tipColor}
               returnKeyType='none'
               underlineColorAndroid='transparent'
 							onChangeText={ (wishText) => this.setState({wishText})}
@@ -282,7 +283,7 @@ const styles = StyleSheet.create({
   },
   tipStyleText: {
     fontSize: 12,
-    color: '#505050'
+    color: tipColor
   },
   timePreferencesContainer: {
     padding: 30
@@ -314,7 +315,7 @@ const styles = StyleSheet.create({
   },
   saveButton: {
     height: 60,
-    backgroundColor: '#6bbf5f',
+    backgroundColor: primaryColor,
     borderRadius: 5
   },
   saveButtonText: {

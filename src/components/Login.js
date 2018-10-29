@@ -4,9 +4,9 @@ import {
   View,
   TextInput,
   StyleSheet,
-  ImageBackground,
   TouchableOpacity,
-  Alert
+	Alert,
+	Linking
 } from 'react-native'
 import apiUtils from '../network/apiUtils'
 import URLS from '../network/urls'
@@ -30,7 +30,7 @@ export default class Login extends React.Component {
 				this.props.navigation.navigate('App')
 			})
 			.catch(err => {
-				if (err.code === 400) Alert.alert('', 'Неправильный логин, либо пароль.')
+				if (err.code === 400) Alert.alert('', 'Неверный логин, либо пароль.')
 				else { alert(err) }
 			})
 	}
@@ -38,20 +38,16 @@ export default class Login extends React.Component {
 	render() {
 		return (
 			<View style={{flex: 1}}>
-				<ImageBackground
-					source={require('../../assets/backgroundImage.png')}
-					style={styles.imageContainer}
-					resizeMode='cover'
-				>
-					<View style={{flexDirection: 'row'}}>
-						<Text style={styles.imageBackgroundText}>Mind </Text>
-						<Text style={StyleSheet.flatten([styles.imageBackgroundText, {color: 'red'}])}>&</Text>
-						<Text style={styles.imageBackgroundText}> Machine</Text>
-					</View>
-					<Text style={styles.imageBackgroundTextLower}>
-						Кабинет сотрудника
-					</Text>
-				</ImageBackground>
+				<View style={styles.headerContainer}>
+					<Text style={[styles.headerText, styles.headerTextLogo]}>Mind </Text>
+					<Text style={StyleSheet.flatten([styles.headerText, styles.headerTextLogo, {color: 'red'}])}>&</Text>
+					<Text style={[styles.headerText, styles.headerTextLogo]}> Machine</Text>					
+				</View>
+
+				<View style={styles.postHeaderContainer}>
+					<Text style={[styles.headerText, styles.headerTextLower]}>Кабинет сотрудника</Text>
+				</View>
+				
 				<View style={styles.dataContainer}>
 					<View style={styles.textInputContainer}>
 						<TextInput
@@ -77,31 +73,49 @@ export default class Login extends React.Component {
 						<Text style={styles.loginButtonText}>Войти</Text>
 					</TouchableOpacity>
 				</View>
+
+				<View style={styles.contactsContainer}>
+					<Text style={styles.contactsText}>
+						Связаться с нами: 8-(919)-1111111
+					</Text>
+				</View>
+
+				<View style={styles.footerContainer}>
+					<Text style={styles.footerText}>
+						Версия: 1.0.0
+					</Text>
+				</View>
 			</View>
 		)
 	}
 }
 
 const styles = StyleSheet.create({
-	imageContainer: {
-		width: '100%',
-		flex: 7,
+	headerContainer: {
+		paddingTop: 30,
 		alignItems: 'center',
-    	justifyContent:'center',
+		justifyContent: 'center',
+		flexDirection: 'row',
+		flex: 2
 	},
-	imageBackgroundText: {
-		textAlign: 'center',
+	postHeaderContainer: {
+		flex: 2,
+		alignItems: 'center',
+		justifyContent: 'center'
+	},
+	headerText: {
 		fontSize: 40,
-		color: '#fff',
+		color: '#000'
+	},
+	headerTextLogo: {
+		fontSize: 40,
 		fontWeight: 'bold'
 	},
-	imageBackgroundTextLower: {
-		textAlign: 'center',
-		fontSize: 20,
-		color: '#fff'
+	headerTextLower: {
+		fontSize: 20
 	},
 	dataContainer: {
-		flex: 3
+		flex: 6
 	},
 	textInputContainer: {
 		flex: 2,
@@ -112,20 +126,36 @@ const styles = StyleSheet.create({
 		borderBottomColor: '#b2b2b2'
 	},
 	textInput: {
-		fontSize: 20
+		fontSize: 30
 	},
 	btn: {
-		flex: 3,
-		marginBottom: 10,
-		marginLeft: 50,
-		marginRight: 50,
+		flex: 2,
+		height: 10,
+		marginLeft: 20,
+		marginRight: 20,
 		borderRadius: 5,
-		backgroundColor: '#6bbf5f',
+		backgroundColor: primaryColor,
 		alignItems: 'center',
 		justifyContent: 'center'
 	},
 	loginButtonText: {
 		fontSize: 20,
 		color: '#fff'
+	},
+	contactsContainer: {
+		flex: 4,
+		alignItems: 'center'
+	},
+	contactsText: {
+		paddingTop: 20,
+		fontSize: 16
+	},
+	footerContainer: {
+		flex: 1,
+		bottom: 0,
+		alignSelf: 'center'
+	},
+	footerText: {
+		color: tipColor
 	}
 })

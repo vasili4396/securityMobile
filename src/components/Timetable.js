@@ -11,7 +11,8 @@ import asyncStorage from '../storage/asyncStorage'
 import moment from 'moment'
 import GestureRecognizer from 'react-native-swipe-gestures'
 import {createStackNavigator} from 'react-navigation'
-import WorkerDay from './WorkerDay';
+import WorkerDay from './WorkerDay'
+import {ColoredCalendarView, ColoredCalendarText} from '../ui-components/ColoredCalendar'
 
 class Timetable extends React.Component {
   constructor(props) {
@@ -20,27 +21,8 @@ class Timetable extends React.Component {
     this.state = {
       workerDays: [],
       userId: null,
+      // todo: change
       currentDate: moment().subtract(3, 'months').startOf('month'),
-      months: {
-        0: 'Январь',
-        1: 'Февраль',
-        2: 'Март',
-        3: 'Апрель',
-        4: 'Май',
-        5: 'Июнь',
-        6: 'Июль',
-        7: 'Август',
-        8: 'Сентябрь',
-        9: 'Октябрь',
-        10: 'Ноябрь',
-        11: 'Декабрь',
-      },
-      workTypes: {
-        'W': 'Работает',
-        'H': 'В',
-        'V': 'От.',
-        'A': 'Отсут.'
-      }
     }
   }
 
@@ -135,14 +117,14 @@ class Timetable extends React.Component {
             dayInCalendar.format('MM'),
             dayInCalendar.format('D'),
             isExistWorkerDay.day.dttm_work_start.slice(0, -3),
-            isExistWorkerDay.day.dttm_work_end.slice(0, -3),
+            isExistWorkerDay.day.dttm_work_end.slice(0, -3)
           ])
         } else {
           arrayOfDays[weekDay].push([
             dayInCalendar.format('YYYY'),
             dayInCalendar.format('MM'),
             dayInCalendar.format('D'),
-            this.state.workTypes[type]
+            workTypes[type]
           ])
         }
       } else {
@@ -150,7 +132,7 @@ class Timetable extends React.Component {
           dayInCalendar.format('YYYY'),
           dayInCalendar.format('MM'),
           dayInCalendar.format('D'),
-          '-'
+          workTypes['E']
         ])
       }
     }
@@ -162,17 +144,28 @@ class Timetable extends React.Component {
             week.map((day, j) => {
               return (
                 <TouchableOpacity
-                  style={styles.day}
+                  style={styles.calendar_day}
                   key={j}
                   onPress={() => this._getWorkerDay(day)}
                 >
-                  <View>
-                    <Text style={{marginBottom: 1, fontSize: 12, textAlign: 'center'}}>{day[2]}{'\n'}</Text>
+                  <View style={styles.calendar_day_date}>
+                    <Text>
+                      {day[2]}{day[1]}
+                    </Text>
                   </View>
-                  <Text style={styles.day_text}>
-                    {day[3]}{'\n'}
-                    {day[4]}
-                  </Text>
+                  <ColoredCalendarView
+                    style={styles.calendar_day_details}
+                    type={Object.keys(workTypes).find(key => workTypes[key] === day[3])}
+                  >
+                    <ColoredCalendarText
+                      style={styles.calendar_day_details_text}
+                      type={Object.keys(workTypes).find(key => workTypes[key] === day[3])}
+                    >
+                      {/* Костыль */}
+                      {/\d/.test(day[3]) ? (day[3] + '\n' + '    -' + '\n') : day[3]}
+                      {day[4]}
+                    </ColoredCalendarText>
+                  </ColoredCalendarView>                  
                 </TouchableOpacity>
               )
             })
@@ -219,35 +212,29 @@ class Timetable extends React.Component {
         config={config}
         style={{flex: 1}}
       >
-      <View>
-
-        <View style={styles.header}>
-          <View style={styles.header_item}>
-            <Text style={[styles.header_text, styles.text_center, styles.bold_text]}>Календарь</Text>
-          </View>
-        </View>
-
         <View>
-          <View style={styles.calendar_header}>
-            <View style={[styles.calendar_header_item]}>
+          <View style={styles.header}>
+            <Text style={styles.header_text}>Расписание</Text>
+          </View>
+
+          <View>
+            <View style={styles.calendar_month}>
               <Text 
-                style={styles.calendar_header_text}
+                style={styles.calendar_month_text}
               >
-                {state.months[state.currentDate.month()]}, {state.currentDate.year()}
+                {months[state.currentDate.month()]}, {state.currentDate.year()}
               </Text>
             </View>
-          </View>
 
-          <View style={styles.calendar_weekdays}>
-            {this.renderWeekDays()}
-          </View>
+            <View style={styles.calendar_weekdays}>
+              {this.renderWeekDays()}
+            </View>
 
-          <View style={styles.calendar_days}>
-            {this.renderDays()}
-          </View>
+            <View style={styles.calendar_days}>
+              {this.renderDays()}
+            </View>
+          </View>          
         </View>
-        
-      </View>
       </GestureRecognizer>
     )
   }
@@ -255,28 +242,14 @@ class Timetable extends React.Component {
 
 const styles = StyleSheet.create({
   header: {
-    backgroundColor: '#6bbf5f',
-    flexDirection: 'row',
-    padding: 30
-  },
-  header_item: {
-    flex: 1
-  },
-  text_center: {
-    textAlign: 'center'
-  },
-  text_right: {
-    textAlign: 'right'
+    backgroundColor: primaryColor,
+    padding: 20
   },
   header_text: {
+    textAlign: 'center',
+    fontWeight: 'bold',
     color: '#fff',
     fontSize: 20
-  },
-  bold_text: {
-    fontWeight: 'bold'
-  },
-  calendar_header: {
-    flexDirection: 'row'
   },
   calendar_header_item: {
     flex: 1,
@@ -288,6 +261,14 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 20
   },
+  calendar_month: {
+    padding: 10,
+    alignItems: 'center'
+  },
+  calendar_month_text: {
+    fontSize: 30,
+    fontWeight: 'bold'
+  },
   calendar_weekdays: {
     flexDirection: 'row'
   },
@@ -296,15 +277,27 @@ const styles = StyleSheet.create({
     color: '#C0C0C0',
     textAlign: 'center'
   },
-  day: {
-    flex: 1,
+  calendar_day: {
+    flex: 3.5,
     backgroundColor: '#F5F5F5',
-    padding: 3,
     height: 80
   },
-  day_text: {
-    textAlign: 'center',
-    color: '#A9A9A9',
+  calendar_day_date: {
+    borderWidth: .5,
+    borderColor: '#aeb4c4',
+    backgroundColor: '#d9d9d9',
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  calendar_day_details: {
+    borderWidth: .5,
+    borderColor: '#aeb4c4',
+    flex: 2.5,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  calendar_day_details_text: {
     fontSize: 12
   }
 })

@@ -7,6 +7,7 @@ import {
   Button
 } from 'react-native'
 import { Table, TableWrapper, Cell } from 'react-native-table-component'
+import Icon from 'react-native-vector-icons/MaterialIcons'
 import moment from 'moment'
 import apiUtils from '../network/apiUtils'
 import URLS from '../network/urls'
@@ -30,15 +31,6 @@ export default class Profile extends React.Component {
       changedConstraints: Object,
       userId: Number,
       currentWeekday: moment().day() - 1,
-      weekdays: {
-        0: 'Понедельник',
-        1: 'Вторник',
-        2: 'Среда',
-        3: 'Четверг',
-        4: 'Пятница',
-        5: 'Суббота',
-        6: 'Воскресенье'
-      }
     }
   }
 
@@ -59,7 +51,7 @@ export default class Profile extends React.Component {
         let constraintsByWeekday = {}
         let tmShopOpens = data.shop_times['tm_start']
         let tmShopCloses = data.shop_times['tm_end']
-        Object.keys(this.state.weekdays).forEach(weekdayNum => constraintsByWeekday[weekdayNum] = [])
+        Object.keys(weekdays).forEach(weekdayNum => constraintsByWeekday[weekdayNum] = [])
         let groupedByWeekday = groupBy(data.constraints_info, 'weekday')
         Object.keys(groupedByWeekday).forEach(key => {
           groupedByWeekday[key].sort(function (a, b) { // просто сортируем по времени
@@ -140,14 +132,13 @@ export default class Profile extends React.Component {
     let currentWeekdayConstraints = state.constraintsInfo[state.currentWeekday]
     let tableData = []
     if (currentWeekdayConstraints) {
-      tableData = currentWeekdayConstraints.map(key => {return key.tm.slice(0, -3)})  // извлекаем только время
-      // ща будет супер костыль
+      tableData = currentWeekdayConstraints.map(key => { return key.tm.slice(0, -3) })  // извлекаем только время
+      // ща будет супер костыль (нужен, чтобы дозаполнить оставшиеся в конце таблицы "пустые" дни)
       let tableDataLength = tableData.length
       for (let i = 0; i < timesPerLine - tableDataLength % timesPerLine; i++) tableData.push('')
       //
-      tableData = new Array(Math.ceil(tableDataLength / timesPerLine)).fill().map(
-        _ => tableData.splice(0, timesPerLine)
-      ) // делим один большой массив на более мелкие
+      tableData = new Array(Math.ceil(tableDataLength / timesPerLine)).fill()
+        .map(_ => tableData.splice(0, timesPerLine)) // делим один большой массив на более мелкие
     }
 
     const element = (cellData, rowIndex, columnIndex) => (
@@ -155,74 +146,172 @@ export default class Profile extends React.Component {
         onPress={() => this._changeWorkOpportunity(rowIndex, columnIndex)}
       >
         <View
-          style={
+          style={[
             !currentWeekdayConstraints[columnIndex + timesPerLine * rowIndex] ? styles.emptyButton :
             currentWeekdayConstraints[columnIndex + timesPerLine * rowIndex].isAbleToWork
                 ? styles.buttonCanWork
-                : styles.buttonUnableToWork
-          }
+                : styles.buttonUnableToWork,
+            styles.tableCellButton
+          ]}
         >
           <Text style={styles.btnText}>{cellData}</Text>
         </View>
       </TouchableOpacity>
-    );
+    )
 
 		return (
-      <View style={styles.container}>
-        <Button
-          onPress={() => this._prevDay()}
-          title="Prev"
-          color="#841584"
-          style={{flexDirection: 'row', flexWrap:'wrap'}}
-        />
-        <Text style={{flexDirection: 'row', flexWrap:'wrap', alignItems: 'flex-start'}}> {state.weekdays[state.currentWeekday]} </Text>
-        <Button
-          onPress={() => this._nextDay()}
-          title="Next"
-          color="#841584"
-        />
-        <Table borderStyle={{borderColor: '#fff'}}>
-          {
-            tableData.map((rowData, rowIndex) => (
-              <TableWrapper key={rowIndex} style={styles.row}>
-                {
-                  rowData.map((cellData, columnIndex) => (
-                    <Cell key={columnIndex} data={element(cellData, rowIndex, columnIndex)} textStyle={styles.text}/>
-                  ))
-                }
-              </TableWrapper>
-            ))
-          }
-        </Table>
-        <Button
-          onPress={() => this._saveChanges()}
-          title="Сохранить изменения"
-          color="#841584"
-        />
+      <View style={{flex: 1}}>
+
+        <View style={styles.headerContainer}>
+          <Text style={styles.headerText}>Пожелание на день недели</Text>
+        </View>
+
+        <View style={styles.postHeaderContainer}>
+          <Text style={styles.postHeaderText}>
+            Красным помечены времена, когда вы не можете работать, а зеленым - когда можете. Нажмите на ячейку, чтобы изменить свои пожелания на день недели.
+          </Text>
+        </View>
+
+        <View style={styles.weekdayContainer}>
+          <View style={styles.leftButtonContainer}>
+            <Icon.Button
+              name='chevron-left'
+              size={30}
+              backgroundColor={goodColor}
+              borderRadius={0}
+              onPress={() => this._prevDay()}
+            >
+            </Icon.Button>
+          </View>
+          <Text style={styles.weekdayText}>{weekdays[state.currentWeekday]}</Text>
+          <View style={styles.rightButtonContainer}>
+            <Icon.Button
+              name='chevron-right'
+              size={30}
+              backgroundColor={goodColor}
+              borderRadius={0}
+              onPress={() => this._nextDay()}
+            >
+            </Icon.Button>
+          </View>
+        </View>
+
+        <View style={styles.tableContainer}>
+          <Table borderStyle={{borderColor: '#fff', borderWidth: .2}}>
+            {
+              tableData.map((rowData, rowIndex) => (
+                <TableWrapper key={rowIndex} style={styles.tableRow}>
+                  {
+                    rowData.map((cellData, columnIndex) => (
+                      <Cell
+                        key={columnIndex}
+                        data={element(cellData, rowIndex, columnIndex)}
+                        style={{padding: .2}}
+                      />
+                    ))
+                  }
+                </TableWrapper>
+              ))
+            }
+          </Table>
+        </View>
+
+        <View style={styles.saveButtonContainer}>
+          <TouchableOpacity onPress={() => this._saveChanges()} style={styles.saveButton}>
+            <Text style={styles.saveButtonText}>
+              Сохранить изменения
+            </Text>
+          </TouchableOpacity>
+        </View>
+
       </View>
 		)
   }
 }
 
 const styles = StyleSheet.create({
-  text: {
-    margin: 6
+  headerContainer:{
+    backgroundColor: primaryColor,
+    padding: 10,
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  headerText : {
+    paddingTop: 15,
+    fontSize: 22,
+    color: '#fff'
+  },
+  postHeaderContainer: {
+    padding: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#d8d8d8',
+    flexDirection: 'row'
+  },
+  postHeaderText: {
+    color: '#727272',
+    flex: 1,
+    flexWrap: 'wrap'
   },
   weekdayContainer: {
-    marginTop: 40,
-    flex: 1,
+    paddingTop: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-between'
+  },
+  weekdayText: {
+    paddingTop: 5,
+    fontSize: 30
+  },
+  leftButtonContainer: {
+    borderTopLeftRadius: 0,
+    borderBottomLeftRadius: 0,
+    borderTopRightRadius: 20,
+    borderBottomRightRadius: 20,
+    overflow: 'hidden'
+  },
+  rightButtonContainer: {
+    borderTopLeftRadius: 20,
+    borderBottomLeftRadius: 20,
+    borderTopRightRadius: 0,
+    borderBottomRightRadius: 0,
+    overflow: 'hidden'
+  },
+  tableContainer: {
+    flex: 10,
+    paddingTop: 10,
+    alignItems: 'center'
+  },
+  tableRow: {
+    flexDirection: 'row'
+  },
+  btnText: {
+    color: '#ffffff'
+  },
+  tableCellButton: {
+    width: 55,
+    height: 55,
+    borderRadius: 2,
     alignItems: 'center',
-    textAlign: 'center',
-    fontSize: 24
+    justifyContent: 'center'
   },
-  container: { 
-    flex: 1, 
-    padding: 16,
-    backgroundColor: '#fff' 
+  buttonUnableToWork: { 
+    backgroundColor: dangerColor,
   },
-  row: { flexDirection: 'row', backgroundColor: '#fff' },
-  buttonUnableToWork: { width: 60, height: 60, backgroundColor: '#FF0000', borderRadius: 2},
-  buttonCanWork: { width: 60, height: 60, backgroundColor: '#01c056', borderRadius: 2},
-  emptyButton: { width: 60, height: 60, backgroundColor: '#fff'},
-  btnText: { textAlign: 'center', justifyContent: 'center', color: '#000000' },
+  buttonCanWork: {
+    backgroundColor: goodColor,
+  },
+  emptyButton: {
+    backgroundColor: '#fff'
+  },
+  saveButtonContainer: {
+    margin: 15,
+    height: 60,
+    backgroundColor: primaryColor,
+    borderRadius: 5
+  },
+  saveButtonText: {
+    fontSize: 20,
+    padding: 15,
+    alignSelf: 'center',
+    color: '#fff'
+  }
 })

@@ -1,21 +1,8 @@
 import React from 'react'
 import { createSwitchNavigator } from 'react-navigation'
 import asyncStorage from './../storage/asyncStorage'
-import { createDrawerNavigator } from 'react-navigation'
-import Profile from './Profile'
 import LoginScreen from './Login'
-import Settings from './Settings'
-import Preferences from './Preferences'
-import Timetable from './Timetable'
-import Logout from './Logout';
-
-const AppDrawerNavigator = createDrawerNavigator({
-  Расписание: Timetable,
-  Пожелания: Preferences,
-  Профиль: Profile,
-  Настройки: Settings,
-  Выйти: Logout
-})
+import SideMenu from './SideMenu'
 
 class AuthLoadingScreen extends React.Component {
   constructor(props) {
@@ -37,7 +24,7 @@ class AuthLoadingScreen extends React.Component {
 export default createSwitchNavigator(
   {
     AuthLoading: AuthLoadingScreen,
-    App: AppDrawerNavigator,
+    App: SideMenu,
     Auth: LoginScreen
   },
   {

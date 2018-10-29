@@ -114,7 +114,7 @@ class Timetable extends React.Component {
           */
           arrayOfDays[weekDay].push([
             dayInCalendar.format('YYYY'),
-            dayInCalendar.format('MM'),
+            dayInCalendar.format('M'),
             dayInCalendar.format('D'),
             isExistWorkerDay.day.dttm_work_start.slice(0, -3),
             isExistWorkerDay.day.dttm_work_end.slice(0, -3)
@@ -122,7 +122,7 @@ class Timetable extends React.Component {
         } else {
           arrayOfDays[weekDay].push([
             dayInCalendar.format('YYYY'),
-            dayInCalendar.format('MM'),
+            dayInCalendar.format('M'),
             dayInCalendar.format('D'),
             workTypes[type]
           ])
@@ -130,7 +130,7 @@ class Timetable extends React.Component {
       } else {
         arrayOfDays[weekDay].push([
           dayInCalendar.format('YYYY'),
-          dayInCalendar.format('MM'),
+          dayInCalendar.format('M'),
           dayInCalendar.format('D'),
           workTypes['E']
         ])
@@ -149,8 +149,12 @@ class Timetable extends React.Component {
                   onPress={() => this._getWorkerDay(day)}
                 >
                   <View style={styles.calendar_day_date}>
-                    <Text>
-                      {day[2]}{day[1]}
+                    <Text
+                      style={[
+                        String(this.state.currentDate.month() + 1) === day[1] ? { color: '#000' } :  { color: '#A9A9A9' }
+                      ]}
+                    >
+                      {day[2]}
                     </Text>
                   </View>
                   <ColoredCalendarView

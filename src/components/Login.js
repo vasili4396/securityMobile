@@ -5,8 +5,7 @@ import {
   TextInput,
   StyleSheet,
   TouchableOpacity,
-	Alert,
-	Linking
+	Alert
 } from 'react-native'
 import apiUtils from '../network/apiUtils'
 import URLS from '../network/urls'

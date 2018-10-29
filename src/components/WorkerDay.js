@@ -123,7 +123,7 @@ export default class WorkerDay extends React.Component {
 
   render () {
     const state = this.state
-    let weekdayNum = (moment(state.date, 'D.MM.YYYY').weekday() + 6) % 7
+    let weekdayNum = (moment(state.date, 'D.M.YYYY').weekday() + 6) % 7
     if (state.workerDay) {
       let todayDate = moment()
       
@@ -147,7 +147,7 @@ export default class WorkerDay extends React.Component {
       return (
         <View style={{flex: 1}}>
           <View style={styles.header}>
-            <Text style={{fontSize: 20}}>{state.date}, {state.weekdays[weekdayNum]}</Text>
+            <Text style={{fontSize: 20}}>{moment(state.date, 'D.M.YYYY').format('D.MM.YYYY')}, {state.weekdays[weekdayNum]}</Text>
           </View>
   
           <View style={{padding: 20, alignItems: 'center'}}>

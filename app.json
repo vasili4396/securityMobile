@@ -1,25 +1,23 @@
 {
   "expo": {
-    "name": "mobileApp",
-    "description": "This project is really great.",
-    "slug": "mobileApp",
+    "name": "QoS mobile",
+    "description": "QoS mobile application.",
+    "slug": "qos-mobile-app",
     "privacy": "public",
     "sdkVersion": "30.0.0",
     "platforms": ["ios", "android"],
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
+    "icon": "./assets/qos_icon.png",
     "updates": {
       "fallbackToCacheTimeout": 0
     },
     "assetBundlePatterns": [
       "**/*"
     ],
+    "android": {
+      "package": "com.qos.mobileApp"
+    },
     "ios": {
       "supportsTablet": true
     }

@@ -4,7 +4,7 @@ import {
   View,
   StyleSheet,
   TouchableOpacity,
-  Button
+  ScrollView
 } from 'react-native'
 import { Table, TableWrapper, Cell } from 'react-native-table-component'
 import Icon from 'react-native-vector-icons/MaterialIcons'
@@ -127,6 +127,10 @@ export default class Profile extends React.Component {
     this.setState({currentWeekday: prevWeekday})
   }
 
+  _openSideMenu () {
+    this.props.navigation.openDrawer()
+  }
+
   render() {
     const state = this.state
     let currentWeekdayConstraints = state.constraintsInfo[state.currentWeekday]
@@ -160,86 +164,97 @@ export default class Profile extends React.Component {
     )
 
 		return (
-      <View style={{flex: 1}}>
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <View style={{flex: 1}}>
 
-        <View style={styles.headerContainer}>
-          <Text style={styles.headerText}>Пожелание на день недели</Text>
-        </View>
+          <View style={styles.header}>
 
-        <View style={styles.postHeaderContainer}>
-          <Text style={styles.postHeaderText}>
-            Красным помечены времена, когда вы не можете работать, а зеленым - когда можете. Нажмите на ячейку, чтобы изменить свои пожелания на день недели.
-          </Text>
-        </View>
+            <TouchableOpacity style={{justifyContent: 'center', flex: .1}} onPress={() => this._openSideMenu()}>
+              <Icon name='menu' size={28} color={'#fff'}></Icon>
+            </TouchableOpacity>
 
-        <View style={styles.weekdayContainer}>
-          <View style={styles.leftButtonContainer}>
-            <Icon.Button
-              name='chevron-left'
-              size={30}
-              backgroundColor={goodColor}
-              borderRadius={0}
-              onPress={() => this._prevDay()}
-            >
-            </Icon.Button>
+            <View style={{flex: .9, justifyContent: 'center'}}>
+              <Text style={styles.headerText}>Пожелание на день</Text>
+            </View>
+
           </View>
-          <Text style={styles.weekdayText}>{weekdays[state.currentWeekday]}</Text>
-          <View style={styles.rightButtonContainer}>
-            <Icon.Button
-              name='chevron-right'
-              size={30}
-              backgroundColor={goodColor}
-              borderRadius={0}
-              onPress={() => this._nextDay()}
-            >
-            </Icon.Button>
-          </View>
-        </View>
 
-        <View style={styles.tableContainer}>
-          <Table borderStyle={{borderColor: '#fff', borderWidth: .2}}>
-            {
-              tableData.map((rowData, rowIndex) => (
-                <TableWrapper key={rowIndex} style={styles.tableRow}>
-                  {
-                    rowData.map((cellData, columnIndex) => (
-                      <Cell
-                        key={columnIndex}
-                        data={element(cellData, rowIndex, columnIndex)}
-                        style={{padding: .2}}
-                      />
-                    ))
-                  }
-                </TableWrapper>
-              ))
-            }
-          </Table>
-        </View>
-
-        <View style={styles.saveButtonContainer}>
-          <TouchableOpacity onPress={() => this._saveChanges()} style={styles.saveButton}>
-            <Text style={styles.saveButtonText}>
-              Сохранить изменения
+          <View style={styles.postHeaderContainer}>
+            <Text style={styles.postHeaderText}>
+              Красным помечены времена, когда вы не можете работать, а зеленым - когда можете. Нажмите на ячейку, чтобы изменить свои пожелания на день недели.
             </Text>
-          </TouchableOpacity>
-        </View>
+          </View>
 
-      </View>
+          <View style={styles.weekdayContainer}>
+            <View style={styles.leftButtonContainer}>
+              <Icon.Button
+                name='chevron-left'
+                size={30}
+                backgroundColor={goodColor}
+                borderRadius={0}
+                onPress={() => this._prevDay()}
+              >
+              </Icon.Button>
+            </View>
+            <Text style={styles.weekdayText}>{weekdays[state.currentWeekday]}</Text>
+            <View style={styles.rightButtonContainer}>
+              <Icon.Button
+                name='chevron-right'
+                size={30}
+                backgroundColor={goodColor}
+                borderRadius={0}
+                onPress={() => this._nextDay()}
+              >
+              </Icon.Button>
+            </View>
+          </View>
+
+          <View style={styles.tableContainer}>
+            <Table borderStyle={{borderColor: '#fff', borderWidth: .2}}>
+              {
+                tableData.map((rowData, rowIndex) => (
+                  <TableWrapper key={rowIndex} style={styles.tableRow}>
+                    {
+                      rowData.map((cellData, columnIndex) => (
+                        <Cell
+                          key={columnIndex}
+                          data={element(cellData, rowIndex, columnIndex)}
+                          style={{padding: .2}}
+                        />
+                      ))
+                    }
+                  </TableWrapper>
+                ))
+              }
+            </Table>
+          </View>
+
+          <View style={styles.saveButtonContainer}>
+            <TouchableOpacity onPress={() => this._saveChanges()} style={styles.saveButton}>
+              <Text style={styles.saveButtonText}>
+                Сохранить изменения
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+        </View>
+      </ScrollView>
 		)
   }
 }
 
 const styles = StyleSheet.create({
-  headerContainer:{
+  header: {
     backgroundColor: primaryColor,
-    padding: 10,
-    alignItems: 'center',
-    justifyContent: 'center'
+    padding: 20,
+    flex: 1,
+    flexDirection: 'row'
   },
-  headerText : {
-    paddingTop: 15,
-    fontSize: 22,
-    color: '#fff'
+  headerText: {
+    textAlign: 'center',
+    fontWeight: 'bold',
+    color: '#fff',
+    fontSize: 20
   },
   postHeaderContainer: {
     padding: 20,

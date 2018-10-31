@@ -3,16 +3,26 @@ import {
   Text,
   View,
   StyleSheet,
-  TouchableOpacity
+  TouchableOpacity,
+  ScrollView
 } from 'react-native'
 import apiUtils from '../network/apiUtils'
 import URLS from '../network/urls'
 import asyncStorage from '../storage/asyncStorage'
 import moment from 'moment'
-import GestureRecognizer from 'react-native-swipe-gestures'
 import {createStackNavigator} from 'react-navigation'
+import GestureRecognizer from 'react-native-swipe-gestures'
+import Icon from 'react-native-vector-icons/MaterialIcons'
 import WorkerDay from './WorkerDay'
 import {ColoredCalendarView, ColoredCalendarText} from '../ui-components/ColoredCalendar'
+
+function renderIfElse(condition, trueContent, falseContent) {
+  if (condition) {
+    return trueContent
+  } else {
+    return falseContent
+  }
+}
 
 class Timetable extends React.Component {
   constructor(props) {
@@ -161,14 +171,29 @@ class Timetable extends React.Component {
                     style={styles.calendar_day_details}
                     type={Object.keys(workTypes).find(key => workTypes[key] === day[3])}
                   >
-                    <ColoredCalendarText
-                      style={styles.calendar_day_details_text}
-                      type={Object.keys(workTypes).find(key => workTypes[key] === day[3])}
-                    >
-                      {/* Костыль */}
-                      {/\d/.test(day[3]) ? (day[3] + '\n' + '    -' + '\n') : day[3]}
-                      {day[4]}
-                    </ColoredCalendarText>
+                    { renderIfElse(
+                      day[4],
+                      <View>
+                        <ColoredCalendarText
+                          style={styles.calendar_day_details_text}
+                          type={Object.keys(workTypes).find(key => workTypes[key] === day[3])}
+                        >
+                          {day[3]}
+                        </ColoredCalendarText>
+                        <ColoredCalendarText
+                          style={styles.calendar_day_details_text}
+                          type={Object.keys(workTypes).find(key => workTypes[key] === day[3])}
+                        >
+                          {day[4]}
+                        </ColoredCalendarText>
+                      </View>,
+                      <ColoredCalendarText
+                        style={styles.calendar_day_details_text}
+                        type={Object.keys(workTypes).find(key => workTypes[key] === day[3])}
+                      >
+                        {day[3]}
+                      </ColoredCalendarText>
+                    )}
                   </ColoredCalendarView>                  
                 </TouchableOpacity>
               )
@@ -180,11 +205,9 @@ class Timetable extends React.Component {
   }
 
   _getWorkerDay (day) {
-    if (day[3] !== '-') {
-      this.props.navigation.navigate('detailsPage', {
-        date: [day[2], day[1], day[0]].join('.')
-      })
-    }
+    this.props.navigation.navigate('detailsPage', {
+      date: [day[2], day[1], day[0]].join('.')
+    })
   }
 
   _onSwipeRight () {
@@ -201,45 +224,52 @@ class Timetable extends React.Component {
     this.getCashierTimetable(this.state.userId, this.state.shopId)
   }
 
+  _openSideMenu () {
+    this.props.navigation.openDrawer()
+  }
+
   render () {
     const state = this.state
 
-    const config = {
-      velocityThreshold: 0.3,
-      directionalOffsetThreshold: 80
-    }
-
     return (
-      <GestureRecognizer
-        onSwipeLeft={() => this._onSwipeLeft()}
-        onSwipeRight={() => this._onSwipeRight()}
-        config={config}
-        style={{flex: 1}}
-      >
-        <View>
+      <ScrollView showsVerticalScrollIndicator={false} stickyHeaderIndices={[0]}>
+        <View style={{backgroundColor: '#fff'}}>
+
           <View style={styles.header}>
-            <Text style={styles.header_text}>Расписание</Text>
+
+            <TouchableOpacity style={{justifyContent: 'center', flex: .1}} onPress={() => this._openSideMenu()}>
+              <Icon name='menu' size={28} color={'#fff'}></Icon>
+            </TouchableOpacity>
+
+            <View style={{flex: .9, justifyContent: 'center'}}>
+              <Text style={styles.headerText}>Расписание</Text>
+            </View>
+
           </View>
 
-          <View>
+          <GestureRecognizer
+            onSwipeLeft={() => this._onSwipeLeft()}
+            onSwipeRight={() => this._onSwipeRight()}
+          >
             <View style={styles.calendar_month}>
-              <Text 
-                style={styles.calendar_month_text}
-              >
+              <Text style={styles.calendar_month_text}>
                 {months[state.currentDate.month()]}, {state.currentDate.year()}
               </Text>
+              <Text style={{color: tipColor, fontSize: 10}}>
+                Свайпните вправо, либо влево, чтобы изменить месяц.
+              </Text>
             </View>
+          </GestureRecognizer>
 
-            <View style={styles.calendar_weekdays}>
-              {this.renderWeekDays()}
-            </View>
-
-            <View style={styles.calendar_days}>
-              {this.renderDays()}
-            </View>
-          </View>          
+          <View style={styles.calendar_weekdays}>
+            {this.renderWeekDays()}
+          </View>
         </View>
-      </GestureRecognizer>
+
+        <View style={styles.calendar_days}>
+          {this.renderDays()}
+        </View>
+      </ScrollView>
     )
   }
 }
@@ -247,22 +277,14 @@ class Timetable extends React.Component {
 const styles = StyleSheet.create({
   header: {
     backgroundColor: primaryColor,
-    padding: 20
+    padding: 20,
+    flex: 1,
+    flexDirection: 'row'
   },
-  header_text: {
+  headerText: {
     textAlign: 'center',
     fontWeight: 'bold',
     color: '#fff',
-    fontSize: 20
-  },
-  calendar_header_item: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingTop: 20,
-  },
-  calendar_header_text: {
-    fontWeight: 'bold',
     fontSize: 20
   },
   calendar_month: {
@@ -298,11 +320,13 @@ const styles = StyleSheet.create({
     borderWidth: .5,
     borderColor: '#aeb4c4',
     flex: 2.5,
+    alignItems: 'center',
     justifyContent: 'center',
-    alignItems: 'center'
+    paddingVertical: 5
   },
   calendar_day_details_text: {
-    fontSize: 12
+    fontSize: 12,
+    marginVertical: 3
   }
 })
 
@@ -320,6 +344,6 @@ export default timetableStackNavigator = createStackNavigator(
         title: 'Пожелания'
       }
     },
-    initialRouteName: 'detailsPage'
+    initialRouteName: 'timetablePage'
   }
 )

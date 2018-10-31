@@ -13,7 +13,7 @@ const ColoredCalendarView = (props) => {
 	
 	coloredBackground = function (type) {
 		return {
-			backgroundColor: workTypesColor[type]
+			backgroundColor: workTypesColor[type],
 		}
 	}
 

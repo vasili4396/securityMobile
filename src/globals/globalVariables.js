@@ -1,5 +1,6 @@
-global.timeFormat = 'HH:mm:ss'
-global.dateFormat = 'DD.MM.YYYY'
+timeFormat = 'HH:mm:ss'
+dateFormat = 'DD.MM.YYYY'
+dateTimeFormat = dateFormat + ' ' + timeFormat
 
 primaryColor = '#6bbf5f'
 tipColor = '#505050'

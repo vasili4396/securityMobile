@@ -1,12 +1,11 @@
 import {
 	View,
-	ScrollView,
 	Text,
 	Image,
 	StyleSheet,
-	TouchableOpacity
+	TouchableOpacity,
+	Dimensions
 } from 'react-native'
-import { LinearGradient } from 'expo'
 import React, {Component} from 'react'
 import { createDrawerNavigator, NavigationActions } from 'react-navigation'
 import asyncStorage from '../storage/asyncStorage'
@@ -18,6 +17,7 @@ import TimetableScreen from './Timetable'
 import LogoutScreen from './Logout'
 
 const iconSize = 35
+const screenWidth = 0.8 * Dimensions.get('screen').width
 
 class SideMenu extends Component {
 	constructor(props) {
@@ -152,8 +152,8 @@ const styles = StyleSheet.create({
 	},
 	menuItemText: {
 		paddingLeft: 5,
-		paddingTop: 10,
-		fontSize: 22,
+		paddingTop: 13,
+		fontSize: 18,
 		color: '#fff'
 	},
 	footerContainer: {
@@ -181,6 +181,7 @@ export default createDrawerNavigator(
 		}
 	},
 	{
-		contentComponent: SideMenu
+		contentComponent: SideMenu,
+		drawerWidth: screenWidth
 	}
 )

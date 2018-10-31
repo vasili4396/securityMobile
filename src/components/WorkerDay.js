@@ -13,16 +13,29 @@ import asyncStorage from '../storage/asyncStorage'
 import moment from 'moment'
 import Icon from 'react-native-vector-icons/MaterialIcons'
 import DateTimePicker from 'react-native-modal-datetime-picker'
-// import Modal from 'react-native-modal'
 import HideableView from '../ui-components/HideableView'
 
+function renderIfElse(condition, trueContent, falseContent) {
+  if (condition) {
+    return trueContent
+  } else {
+    return falseContent
+  }
+}
+
 export default class WorkerDay extends React.Component {
+  _isMounted = false
+
   constructor(props) {
     super(props)
     this.state = {
       date: this.props.navigation.state.params.date,
-      selectedWorkType: null,
+      userId: null,
+      initialWorkType: 'H',
+      selectedWorkType: 'H',
+      initialWorkStartTime: null,
       workStartTime: null,
+      initialWorkEndTime: null,
       workEndTime: null,
       isStartTimePickerVifsible: false,
       isEndTimePickerVisible: false,
@@ -40,24 +53,42 @@ export default class WorkerDay extends React.Component {
         'W': 'Рабочий',
         'H': 'Выходной',
         'V': 'Отпуск',
-        'A': 'Отсутутствовал'
+        'A': 'Отсутствие'
       },
-      workerDay: null
+      workerDay: null,
+      changeRequest: null
     }
+  }
+
+  componentDidMount () {
+    this._isMounted = true
+
     asyncStorage.getItem('user').then(userInfo => {
-      this.getWorkerDay(userInfo.id)
+      if (this._isMounted) {
+        this.setState({userId: userInfo.id})
+        this.getWorkerDayInfo(userInfo.id)
+      }
     })
   }
 
-  getWorkerDay = (userId) => {
-    apiUtils.sendRequest(URLS.url.getWorkerDay, 'GET', {
+  componentWillUnmount () {
+    this._isMounted = false
+  }
+
+  getWorkerDayInfo = (userId) => {
+    let requestGetParams = {
       worker_id: userId,
-      dt: this.state.date,
-    })
+      dt: this.state.date
+    }
+
+    apiUtils.sendRequest(URLS.url.getWorkerDay, 'GET', requestGetParams)
       .then(response => response.data)
       .then(response => {
         this.setState({
           workerDay: response,
+          initialWorkType: response.day.type,
+          initialWorkStartTime: response.day.dttm_work_start,
+          initialWorkEndTime: response.day.dttm_work_end,
           selectedWorkType: response.day.type,
           workStartTime: response.day.dttm_work_start,
           workEndTime: response.day.dttm_work_end
@@ -67,11 +98,19 @@ export default class WorkerDay extends React.Component {
         if (err.code === 401) {
           this.props.navigation.navigate('Auth')
         } else if (err.code === 400) {
-          alert('Извините, такого дня в расписании нет.')
-          this.props.navigation.goBack()
-        } else {
+          this.setState({ workerDay: Object })
+        } 
+        else {
           alert(err)
         }
+      })
+
+    apiUtils.sendRequest(URLS.url.getChangeRequest, 'GET', requestGetParams)
+      .then(response => {
+        this.setState({ changeRequest: response.data })
+      })
+      .catch(err => {
+        alert(err)
       })
   }
 
@@ -107,6 +146,11 @@ export default class WorkerDay extends React.Component {
   }
 
   _trySaveNewWorkerDay = () => {
+    const state = this.state
+    if (state.workerDay.hasOwnProperty('day') && state.initialWorkType === state.selectedWorkType && state.initialWorkStartTime === state.workStartTime && state.initialWorkEndTime === state.workEndTime) {
+      Alert.alert('Ошибка', 'Извините, но вы еще ничего не поменяли.')
+      return
+    }
     Alert.alert(
       '',
       'Вы действительно хотите сохранить изменения?',
@@ -118,43 +162,59 @@ export default class WorkerDay extends React.Component {
   }
 
   _saveWorkerDay = () => {
-    console.log('success')
+    let workType = this.state.selectedWorkType
+    
+    apiUtils.sendRequest(URLS.url.requestWorkerDay, 'POST', {
+      worker_id: this.state.userId,
+      dt: this.state.date,
+      type: workType,
+      tm_work_start: workType === 'W' ? this.state.workStartTime : null,
+      tm_work_end: workType === 'W' ? this.state.workEndTime: null,
+      wish_text: this.state.wishText
+    })
+      .then(() => {
+        Alert.alert('', 'Запрос на изменение рабочего дня успешно отправлен менеджеру.')
+      })
+      .catch(err => {
+        alert(err)
+      })
   }
 
   render () {
     const state = this.state
     let weekdayNum = (moment(state.date, 'D.M.YYYY').weekday() + 6) % 7
-    if (state.workerDay) {
-      let todayDate = moment()
-      
-      let workStartTime = moment(state.workStartTime, timeFormat)
-      let workEndTime = moment(state.workEndTime, timeFormat)
-      let workStartDateTime = new Date(
-        todayDate.year(),
-        todayDate.month(),
-        todayDate.day(),
-        workStartTime.hour(),
-        workStartTime.minute()
-      )
-      let workEndDateTime = new Date(
-        todayDate.year(),
-        todayDate.month(),
-        todayDate.day(),
-        workEndTime.hour(),
-        workEndTime.minute()
-      )
+    
+    let todayDate = moment()
+    
+    let workStartTime = moment(state.workStartTime, timeFormat)
+    let workEndTime = moment(state.workEndTime, timeFormat)
+    let workStartDateTime = new Date(
+      todayDate.year(),
+      todayDate.month(),
+      todayDate.day(),
+      workStartTime.hour(),
+      workStartTime.minute()
+    )
+    let workEndDateTime = new Date(
+      todayDate.year(),
+      todayDate.month(),
+      todayDate.day(),
+      workEndTime.hour(),
+      workEndTime.minute()
+    )
 
-      return (
-        <View style={{flex: 1}}>
-          <View style={styles.header}>
-            <Text style={{fontSize: 20}}>{moment(state.date, 'D.M.YYYY').format('D.MM.YYYY')}, {state.weekdays[weekdayNum]}</Text>
-          </View>
-  
-          <View style={{padding: 20, alignItems: 'center'}}>
-            <Text style={{fontSize: 14}}>Статус дня</Text>
-          </View>
-          
-          <View style={styles.workDayType}>
+    return (
+      <View style={{flex: 1}}>
+        <View style={styles.headerContainer}>
+          <Text style={styles.headerText}>{moment(state.date, 'D.M.YYYY').format('D.MM.YYYY')}, {state.weekdays[weekdayNum]}</Text>
+        </View>
+
+        <View style={styles.dayStatusTextContainer}>
+          <Text style={{fontSize: 14}}>Статус дня</Text>
+        </View>
+
+        <View style={styles.workDayTypeContainer}>
+          <View style={styles.workDayTypeRow}>
             <View style={styles.leftButtonContainer}>
               <Icon.Button
                 name='chevron-left'
@@ -179,31 +239,33 @@ export default class WorkerDay extends React.Component {
               </Icon.Button>
             </View>
           </View>
+        </View>
 
-          <View style={styles.tipStyle}>
-            <Text style={styles.tipStyleText}>Нажмите на стрелочку, чтобы изменить</Text>
-          </View>
+        <View style={styles.tipStyleContainer}>
+          <Text style={styles.tipStyleText}>Нажмите на стрелочку, чтобы изменить</Text>
+        </View>
 
-          <View style={styles.personalPreferencesContainer}>
-            <TextInput
-              style={styles.personalPreferencesInput}
-              placeholder='Введите текст пожелания'
-              placeholderTextColor={tipColor}
-              returnKeyType='none'
-              underlineColorAndroid='transparent'
-							onChangeText={ (wishText) => this.setState({wishText})}
-						/>
-          </View>
+        <View style={styles.personalPreferencesContainer}>
+          <TextInput
+            style={styles.personalPreferencesInput}
+            placeholder='Введите текст пожелания'
+            placeholderTextColor={tipColor}
+            returnKeyType='none'
+            underlineColorAndroid='transparent'
+            onChangeText={ (wishText) => this.setState({wishText})}
+          />
+        </View>
 
+        <View style={styles.timePreferencesContainer}>
           <HideableView 
-            style={styles.timePreferencesContainer}
+            style={styles.hideableViewContainer}
             hide={state.selectedWorkType !== 'W'}
           >
             <View style={styles.timesContainer}>
               <TouchableOpacity onPress={this._showStartTimePicker}>
                 <Text style={{fontSize: 14}}>Время начала</Text>
                 <Text style={styles.timePreferences}>
-                  {state.workStartTime ? state.workStartTime.slice(0, -3): 'Не указано'}
+                  {state.workStartTime ? state.workStartTime.slice(0, -3): 'Не задано'}
                 </Text>
               </TouchableOpacity>
               <DateTimePicker
@@ -220,7 +282,7 @@ export default class WorkerDay extends React.Component {
               <TouchableOpacity onPress={this._showEndTimePicker}>
                 <Text style={{fontSize: 14}}>Время окончания</Text>
                 <Text style={styles.timePreferences}>
-                  {state.workEndTime ? state.workEndTime.slice(0, -3): 'Не указано'}
+                  {state.workEndTime ? state.workEndTime.slice(0, -3): 'Не задано'}
                 </Text>
               </TouchableOpacity>
               <DateTimePicker
@@ -235,34 +297,65 @@ export default class WorkerDay extends React.Component {
               />
             </View>
           </HideableView>
-
-          <View style={styles.saveButtonContainer}>
-            <TouchableOpacity onPress={this._trySaveNewWorkerDay} style={styles.saveButton}>
-              <Text style={styles.saveButtonText}>
-                Сохранить изменения
-              </Text>
-            </TouchableOpacity>
-          </View>
         </View>
-      )
-    } else {
-      return null
-    }
+
+        <View style={styles.changeRequestContainer}>
+          {
+            renderIfElse(
+              state.changeRequest,
+              <Text>
+                <Text style={styles.changeRequestText}>Вы уже запрашивал изменение графика на этот день. Статус запроса: </Text>
+                {
+                  renderIfElse(
+                    state.changeRequest && state.changeRequest.hasOwnProperty('is_approved') && state.changeRequest.is_approved,
+                    <Text style={[styles.changeRequestText, {color: 'green'}]}>одобрен</Text>,
+                    <Text style={[styles.changeRequestText, {color: 'red'}]}>не одобрен</Text>
+                  )
+                }
+              </Text>,
+              null
+              //<Text style={styles.changeRequestText}>Вы еще не запрашивали изменений рабочего графика на этот день.</Text>
+            )
+          }
+        </View>
+
+        <View style={styles.saveButtonContainer}>
+          <TouchableOpacity onPress={this._trySaveNewWorkerDay} style={styles.saveButton}>
+            <Text style={styles.saveButtonText}>
+              Сохранить изменения
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    )
   }
 }
 
 const styles = StyleSheet.create({
-  header: {
+  headerContainer: {
     alignItems: 'center',
-    padding: 10
+    paddingTop: 10,
+    flex: 1
   },
-  workDayType: {
+  headerText: {
+    fontSize: 20
+  },
+  dayStatusTextContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    flex: .7
+  },
+  workDayTypeContainer: {
+    flex: 2,
+    justifyContent: 'center'
+  },
+  workDayTypeRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
   },
   workDayTypeText: {
     paddingTop: 5,
-    fontSize: 30
+    fontSize: 30,
   },
   leftButtonContainer: {
     borderTopLeftRadius: 0,
@@ -278,15 +371,31 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 0,
     overflow: 'hidden'
   },
-  tipStyle: {
-    alignItems: 'center'
+  tipStyleContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    flex: .7
   },
   tipStyleText: {
     fontSize: 12,
     color: tipColor
   },
+  personalPreferencesContainer: {
+    flex: 2,
+    paddingHorizontal: 15
+  },
+  personalPreferencesInput: {
+    fontSize: 20,
+    height: 60,
+    borderBottomWidth: 1,
+    borderBottomColor: '#000000'
+  },
   timePreferencesContainer: {
-    padding: 30
+    flex: 4,
+    justifyContent: 'center'
+  },
+  hideableViewContainer: {
+    padding: 15
   },
   timesContainer: {
     flexDirection: 'row',
@@ -296,21 +405,19 @@ const styles = StyleSheet.create({
     fontSize: 26,
     textDecorationLine: 'underline'
   },
-  personalPreferencesContainer: {
-    paddingTop: 30
+  changeRequestContainer: {
+    flex: 4,
+    paddingHorizontal: 15,
+    justifyContent: 'center',
+    alignItems: 'center'
   },
-  personalPreferencesInput: {
-    margin: 15,
-    fontSize: 20,
-    height: 60,
-    borderBottomWidth: 1,
-    borderBottomColor: '#000000'
+  changeRequestText: {
+    fontSize: 18
   },
   saveButtonContainer: {
-    position: 'absolute',
-    bottom: 40,
-    left: 10,
-    right: 10,
+    flex: 4,
+    justifyContent: 'center',
+    paddingHorizontal: 10,
     alignSelf: 'stretch'
   },
   saveButton: {

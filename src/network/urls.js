@@ -13,9 +13,11 @@ export const URLS = {
         updateCSRF: API_ENDPOINT + 'auth/update_csrf',
         //cashier
         workerInfo: API_ENDPOINT + 'timetable/cashier/get_cashier_info',
-        setWorkerInfo: API_ENDPOINT + 'timetable/cashier/set_cashier_info',
+        setWorkerInfo: API_ENDPOINT + 'timetable/cashier/set_cashier_info_lite',
         getWorkerTimetable: API_ENDPOINT + 'timetable/cashier/get_cashier_timetable',
-        getWorkerDay: API_ENDPOINT + 'timetable/cashier/get_worker_day'
+        getWorkerDay: API_ENDPOINT + 'timetable/cashier/get_worker_day',
+        requestWorkerDay: API_ENDPOINT + 'timetable/cashier/request_worker_day',
+        getChangeRequest: API_ENDPOINT + 'timetable/cashier/get_change_request'
     }
 }
 

@@ -37,12 +37,14 @@ class Timetable extends React.Component {
   }
 
   componentDidMount () {
-    asyncStorage.getItem('user').then(userInfo => {
-      let uid = userInfo.id
-      let shopId = userInfo.shop_id
-      this.getCashierTimetable(uid, shopId)
-      this.setState({userId: uid, shopId: shopId})
-    })
+    this.setTimeout(() => {
+      asyncStorage.getItem('user').then(userInfo => {
+        let uid = userInfo.id
+        let shopId = userInfo.shop_id
+        this.getCashierTimetable(uid, shopId)
+        this.setState({userId: uid, shopId: shopId})
+      })  
+    }, 10000);
   }
 
   computeExtremeDates () {

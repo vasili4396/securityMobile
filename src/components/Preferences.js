@@ -36,8 +36,13 @@ export default class Profile extends React.Component {
 
   componentDidMount () {
     asyncStorage.getItem('user').then(userInfo => {
-      this.getConstraint(userInfo.id)
-      this.setState({userId: userInfo.id})
+      if (userInfo) {
+        this.getConstraint(userInfo.id)
+        this.setState({userId: userInfo.id})
+      } else {
+        asyncStorage.clearStorage()
+        this.props.navigation.navigate('AuthLoading')
+      }
     })
   }
 
@@ -71,12 +76,12 @@ export default class Profile extends React.Component {
           tmShopOpens = tmShopCloses = '00:00:00'
         }
         Object.keys(constraintsByWeekday).forEach(weekdayNum => {
-          for (let startTime = moment(tmShopOpens, 'HH:mm:ss'); startTime <= moment(tmShopCloses, 'HH:mm:ss'); startTime.add(...timePeriod)) {
+          for (let startTime = moment(tmShopOpens, timeFormat); startTime <= moment(tmShopCloses, timeFormat); startTime.add(...timePeriod)) {
             constraintsByWeekday[weekdayNum].push({
-              tm: startTime.format('HH:mm:ss'),
+              tm: startTime.format(timeFormat),
               isAbleToWork: !(
                 groupedByWeekday.hasOwnProperty(weekdayNum) && 
-                groupedByWeekday[weekdayNum].some(el => { return el.tm === startTime.format('HH:mm:ss') })
+                groupedByWeekday[weekdayNum].some(el => { return el.tm === startTime.format(timeFormat) })
               )
             })
           }

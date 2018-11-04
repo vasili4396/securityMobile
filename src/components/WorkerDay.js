@@ -61,13 +61,11 @@ export default class WorkerDay extends React.Component {
   }
 
   componentDidMount () {
-    this._isMounted = true
+    // this._isMounted = true
 
     asyncStorage.getItem('user').then(userInfo => {
-      if (this._isMounted) {
-        this.setState({userId: userInfo.id})
-        this.getWorkerDayInfo(userInfo.id)
-      }
+      this.setState({userId: userInfo.id})
+      this.getWorkerDayInfo(userInfo.id)
     })
   }
 
@@ -112,6 +110,7 @@ export default class WorkerDay extends React.Component {
       .catch(err => {
         alert(err)
       })
+    this._isMounted = true
   }
 
   _prevWorkType () {
@@ -202,132 +201,138 @@ export default class WorkerDay extends React.Component {
       workEndTime.hour(),
       workEndTime.minute()
     )
-
-    return (
-      <View style={{flex: 1}}>
-        <View style={styles.headerContainer}>
-          <Text style={styles.headerText}>{moment(state.date, 'D.M.YYYY').format('D.MM.YYYY')}, {state.weekdays[weekdayNum]}</Text>
-        </View>
-
-        <View style={styles.dayStatusTextContainer}>
-          <Text style={{fontSize: 14}}>Статус дня</Text>
-        </View>
-
-        <View style={styles.workDayTypeContainer}>
-          <View style={styles.workDayTypeRow}>
-            <View style={styles.leftButtonContainer}>
-              <Icon.Button
-                name='chevron-left'
-                size={30}
-                backgroundColor={primaryColor}
-                borderRadius={0}
-                onPress={() => this._prevWorkType()}
-              >
-              </Icon.Button>
-            </View>
-
-            <Text style={styles.workDayTypeText}>{state.workTypes[state.selectedWorkType]}</Text>
-
-            <View style={styles.rightButtonContainer}>
-              <Icon.Button
-                name='chevron-right'
-                size={30}
-                backgroundColor={primaryColor}
-                borderRadius={0}
-                onPress={() => this._nextWorkType()}
-              >
-              </Icon.Button>
+    if (this._isMounted) {
+      return (
+        <View style={{flex: 1}}>
+          <View style={styles.headerContainer}>
+            <Text style={styles.headerText}>{moment(state.date, 'D.M.YYYY').format('D.MM.YYYY')}, {state.weekdays[weekdayNum]}</Text>
+          </View>
+  
+          <View style={styles.dayStatusTextContainer}>
+            <Text style={{fontSize: 14}}>Статус дня</Text>
+          </View>
+  
+          <View style={styles.workDayTypeContainer}>
+            <View style={styles.workDayTypeRow}>
+              <View style={styles.leftButtonContainer}>
+                <Icon.Button
+                  name='chevron-left'
+                  size={30}
+                  backgroundColor={primaryColor}
+                  borderRadius={0}
+                  onPress={() => this._prevWorkType()}
+                >
+                </Icon.Button>
+              </View>
+  
+              <Text style={styles.workDayTypeText}>{state.workTypes[state.selectedWorkType]}</Text>
+  
+              <View style={styles.rightButtonContainer}>
+                <Icon.Button
+                  name='chevron-right'
+                  size={30}
+                  backgroundColor={primaryColor}
+                  borderRadius={0}
+                  onPress={() => this._nextWorkType()}
+                >
+                </Icon.Button>
+              </View>
             </View>
           </View>
+  
+          <View style={styles.tipStyleContainer}>
+            <Text style={styles.tipStyleText}>Нажмите на стрелочку, чтобы изменить</Text>
+          </View>
+  
+          <View style={styles.personalPreferencesContainer}>
+            <TextInput
+              style={styles.personalPreferencesInput}
+              placeholder='Введите текст пожелания'
+              placeholderTextColor={tipColor}
+              returnKeyType='none'
+              underlineColorAndroid='transparent'
+              onChangeText={ (wishText) => this.setState({wishText})}
+            />
+          </View>
+  
+          <View style={styles.timePreferencesContainer}>
+            <HideableView 
+              style={styles.hideableViewContainer}
+              hide={state.selectedWorkType !== 'W'}
+            >
+              <View style={styles.timesContainer}>
+                <TouchableOpacity onPress={this._showStartTimePicker}>
+                  <Text style={{fontSize: 14}}>Время начала</Text>
+                  <Text style={styles.timePreferences}>
+                    {state.workStartTime ? state.workStartTime.slice(0, -3): 'Не задано'}
+                  </Text>
+                </TouchableOpacity>
+                <DateTimePicker
+                  isVisible={state.isStartTimePickerVisible}
+                  onConfirm={this._handleStartTimePicked}
+                  onCancel={this._hideStartTimePicker}      
+                  mode='time'
+                  date={workStartDateTime}
+                  titleIOS='Выберите время'
+                  confirmTextIOS='Подтвердить'
+                  cancelTextIOS='Отменить'
+                />
+  
+                <TouchableOpacity onPress={this._showEndTimePicker}>
+                  <Text style={{fontSize: 14}}>Время окончания</Text>
+                  <Text style={styles.timePreferences}>
+                    {state.workEndTime ? state.workEndTime.slice(0, -3): 'Не задано'}
+                  </Text>
+                </TouchableOpacity>
+                <DateTimePicker
+                  isVisible={state.isEndTimePickerVisible}
+                  onConfirm={this._handleEndTimePicked}
+                  onCancel={this._hideEndTimePicker}
+                  date={workEndDateTime}
+                  mode='time'
+                  titleIOS='Выберите время'
+                  confirmTextIOS='Подтвердить'
+                  cancelTextIOS='Отменить'
+                />
+              </View>
+            </HideableView>
+          </View>
+{/*   
+          <View style={styles.changeRequestContainer}>
+            {
+              renderIfElse(
+                state.changeRequest && state.changeRequest.hasOwnProperty('status_type'),
+                <Text>
+                  <Text style={styles.changeRequestText}>Вы уже запрашивал изменение графика на этот день. Статус запроса: </Text>
+                  {
+                    renderIfElse(
+                      state.changeRequest.status_type === 'A',
+                      <Text style={[styles.changeRequestText, {color: 'green'}]}>одобрен</Text>,
+                      renderIfElse(
+                        state.changeRequest.status_type === 'D',
+                        <Text style={[styles.changeRequestText, {color: 'red'}]}>не одобрен</Text>,
+                        <Text style={[styles.changeRequestText, {color: 'yellow'}]}>на рассмотрении</Text>
+                      )
+                    )
+                  }
+                </Text>,
+                null
+              )
+            }
+          </View> */}
+  
+          <View style={styles.saveButtonContainer}>
+            <TouchableOpacity onPress={this._trySaveNewWorkerDay} style={styles.saveButton}>
+              <Text style={styles.saveButtonText}>
+                Сохранить изменения
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
-
-        <View style={styles.tipStyleContainer}>
-          <Text style={styles.tipStyleText}>Нажмите на стрелочку, чтобы изменить</Text>
-        </View>
-
-        <View style={styles.personalPreferencesContainer}>
-          <TextInput
-            style={styles.personalPreferencesInput}
-            placeholder='Введите текст пожелания'
-            placeholderTextColor={tipColor}
-            returnKeyType='none'
-            underlineColorAndroid='transparent'
-            onChangeText={ (wishText) => this.setState({wishText})}
-          />
-        </View>
-
-        <View style={styles.timePreferencesContainer}>
-          <HideableView 
-            style={styles.hideableViewContainer}
-            hide={state.selectedWorkType !== 'W'}
-          >
-            <View style={styles.timesContainer}>
-              <TouchableOpacity onPress={this._showStartTimePicker}>
-                <Text style={{fontSize: 14}}>Время начала</Text>
-                <Text style={styles.timePreferences}>
-                  {state.workStartTime ? state.workStartTime.slice(0, -3): 'Не задано'}
-                </Text>
-              </TouchableOpacity>
-              <DateTimePicker
-                isVisible={state.isStartTimePickerVisible}
-                onConfirm={this._handleStartTimePicked}
-                onCancel={this._hideStartTimePicker}      
-                mode='time'
-                date={workStartDateTime}
-                titleIOS='Выберите время'
-                confirmTextIOS='Подтвердить'
-                cancelTextIOS='Отменить'
-              />
-
-              <TouchableOpacity onPress={this._showEndTimePicker}>
-                <Text style={{fontSize: 14}}>Время окончания</Text>
-                <Text style={styles.timePreferences}>
-                  {state.workEndTime ? state.workEndTime.slice(0, -3): 'Не задано'}
-                </Text>
-              </TouchableOpacity>
-              <DateTimePicker
-                isVisible={state.isEndTimePickerVisible}
-                onConfirm={this._handleEndTimePicked}
-                onCancel={this._hideEndTimePicker}
-                date={workEndDateTime}
-                mode='time'
-                titleIOS='Выберите время'
-                confirmTextIOS='Подтвердить'
-                cancelTextIOS='Отменить'
-              />
-            </View>
-          </HideableView>
-        </View>
-
-        <View style={styles.changeRequestContainer}>
-          {
-            renderIfElse(
-              state.changeRequest,
-              <Text>
-                <Text style={styles.changeRequestText}>Вы уже запрашивал изменение графика на этот день. Статус запроса: </Text>
-                {
-                  renderIfElse(
-                    state.changeRequest && state.changeRequest.hasOwnProperty('is_approved') && state.changeRequest.is_approved,
-                    <Text style={[styles.changeRequestText, {color: 'green'}]}>одобрен</Text>,
-                    <Text style={[styles.changeRequestText, {color: 'red'}]}>не одобрен</Text>
-                  )
-                }
-              </Text>,
-              null
-              //<Text style={styles.changeRequestText}>Вы еще не запрашивали изменений рабочего графика на этот день.</Text>
-            )
-          }
-        </View>
-
-        <View style={styles.saveButtonContainer}>
-          <TouchableOpacity onPress={this._trySaveNewWorkerDay} style={styles.saveButton}>
-            <Text style={styles.saveButtonText}>
-              Сохранить изменения
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    )
+      )
+    } else {
+      return null
+    }
   }
 }
 

@@ -31,20 +31,17 @@ class Timetable extends React.Component {
     this.state = {
       workerDays: [],
       userId: null,
-      // todo: change
-      currentDate: moment().subtract(3, 'months').startOf('month'),
+      currentDate: moment().startOf('month'),
     }
   }
 
   componentDidMount () {
-    this.setTimeout(() => {
-      asyncStorage.getItem('user').then(userInfo => {
-        let uid = userInfo.id
-        let shopId = userInfo.shop_id
-        this.getCashierTimetable(uid, shopId)
-        this.setState({userId: uid, shopId: shopId})
-      })  
-    }, 10000);
+    asyncStorage.getItem('user').then(userInfo => {
+      let uid = userInfo.id
+      let shopId = userInfo.shop_id
+      this.getCashierTimetable(uid, shopId)
+      this.setState({userId: uid, shopId: shopId})
+    })
   }
 
   computeExtremeDates () {

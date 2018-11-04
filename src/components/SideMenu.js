@@ -9,8 +9,8 @@ import {
 import React, {Component} from 'react'
 import { createDrawerNavigator, NavigationActions } from 'react-navigation'
 import asyncStorage from '../storage/asyncStorage'
-import Icon from 'react-native-vector-icons/FontAwesome'
-import ProfileScreen from './Profile'
+import Icon from 'react-native-vector-icons/MaterialIcons'
+import NotificationsScreen from './Notifications'
 import SettingsScreen from './Settings'
 import PreferencesScreen from './Preferences'
 import TimetableScreen from './Timetable'
@@ -42,7 +42,20 @@ class SideMenu extends Component {
 	  })
 	  this.props.navigation.dispatch(navigateAction)
 	}
-  
+
+	renderMenuItem (routeName, icon, itemName) {
+		return (
+			<TouchableOpacity onPress={this.navigateToScreen(routeName)} style={styles.menuItem}>
+				<View style={styles.iconContainer}>
+					<Icon name={icon} size={iconSize} color={primaryColor}></Icon>
+				</View>
+				<Text style={styles.menuItemText}>
+					{itemName}
+				</Text>
+			</TouchableOpacity>
+		)
+	}
+   
 	render () {
 		const state = this.state
 	  return (
@@ -59,54 +72,17 @@ class SideMenu extends Component {
 				</View>
 				
 			</View>
-			<View style={styles.navigationMenuContainer}>
 
-				<TouchableOpacity onPress={this.navigateToScreen('Timetable')} style={styles.menuItem}>
-					<View style={styles.iconContainer}>
-						<Icon name='calendar' size={iconSize} color={primaryColor}></Icon>
-					</View>
-					<Text style={styles.menuItemText} onPress={this.navigateToScreen('Timetable')}>
-						Расписание
-					</Text>
-				</TouchableOpacity>
-
-				<TouchableOpacity onPress={this.navigateToScreen('Preferences')} style={styles.menuItem}>
-					<View style={styles.iconContainer}>
-					<Icon name='id-card' size={iconSize} color={primaryColor} ></Icon>
-					</View>
-					<Text style={styles.menuItemText}>
-						Пожелания на день
-					</Text>
-				</TouchableOpacity>
-
-				<TouchableOpacity onPress={this.navigateToScreen('Settings')} style={styles.menuItem}>
-					<View style={styles.iconContainer}>
-						<Icon name='cog' size={iconSize} color={primaryColor}></Icon>
-					</View>
-					<Text style={styles.menuItemText}>
-						Настройки
-					</Text>
-				</TouchableOpacity>
-
-				<TouchableOpacity onPress={this.navigateToScreen('Profile')} style={styles.menuItem}>
-					<View style={styles.iconContainer}>
-						<Icon name='user' size={iconSize} color={primaryColor}></Icon>
-					</View>
-					<Text style={styles.menuItemText}>
-						Профиль
-					</Text>
-				</TouchableOpacity>
-
+			<View style={styles.navigationMenuContainer}>				
+				{this.renderMenuItem('Timetable', 'perm-contact-calendar', 'Расписание')}
+				{this.renderMenuItem('Preferences', 'view-week', 'Пожелания на день')}
+				{this.renderMenuItem('Notifications', 'notifications', 'Уведомления')}
+				{this.renderMenuItem('Settings', 'settings', 'Настройки')}
 			</View>
 
-		  <TouchableOpacity onPress={this.navigateToScreen('Logout')} style={styles.menuItem}>
-				<View style={styles.iconContainer}>
-					<Icon name='sign-out' size={iconSize} color={primaryColor}></Icon>
-				</View>
-				<Text style={styles.menuItemText}>
-					Выйти
-				</Text>
-			</TouchableOpacity>
+			<View style={styles.footerContainer}>
+				{this.renderMenuItem('Logout', 'exit-to-app', 'Выйти')}
+			</View>
 
 		</View>
 	  )
@@ -170,8 +146,8 @@ export default createDrawerNavigator(
 		Preferences: {
 			screen: PreferencesScreen
 		},
-		Profile: {
-			screen: ProfileScreen
+		Notifications: {
+			screen: NotificationsScreen
 		},
 		Settings: {
 			screen: SettingsScreen

@@ -30,19 +30,14 @@ export default class Profile extends React.Component {
       constraintsInfo: Object,
       changedConstraints: Object,
       userId: Number,
-      currentWeekday: moment().day() - 1,
+      currentWeekday: (moment().day() + 6) % 7,
     }
   }
 
   componentDidMount () {
     asyncStorage.getItem('user').then(userInfo => {
-      if (userInfo) {
-        this.getConstraint(userInfo.id)
-        this.setState({userId: userInfo.id})
-      } else {
-        asyncStorage.clearStorage()
-        this.props.navigation.navigate('AuthLoading')
-      }
+      this.getConstraint(userInfo.id)
+      this.setState({userId: userInfo.id})
     })
   }
 
@@ -169,81 +164,83 @@ export default class Profile extends React.Component {
     )
 
 		return (
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <View style={{flex: 1}}>
+      <View style={{flex: 1}}>
 
-          <View style={styles.header}>
+        <View style={styles.header}>
 
-            <TouchableOpacity style={{justifyContent: 'center', flex: .1}} onPress={() => this._openSideMenu()}>
-              <Icon name='menu' size={28} color={'#fff'}></Icon>
-            </TouchableOpacity>
+          <TouchableOpacity style={{justifyContent: 'center', flex: .1}} onPress={() => this._openSideMenu()}>
+            <Icon name='menu' size={28} color={'#fff'}></Icon>
+          </TouchableOpacity>
 
-            <View style={{flex: .9, justifyContent: 'center'}}>
-              <Text style={styles.headerText}>Пожелание на день</Text>
-            </View>
-
-          </View>
-
-          <View style={styles.postHeaderContainer}>
-            <Text style={styles.postHeaderText}>
-              Красным помечены времена, когда вы не можете работать, а зеленым - когда можете. Нажмите на ячейку, чтобы изменить свои пожелания на день недели.
-            </Text>
-          </View>
-
-          <View style={styles.weekdayContainer}>
-            <View style={styles.leftButtonContainer}>
-              <Icon.Button
-                name='chevron-left'
-                size={30}
-                backgroundColor={goodColor}
-                borderRadius={0}
-                onPress={() => this._prevDay()}
-              >
-              </Icon.Button>
-            </View>
-            <Text style={styles.weekdayText}>{weekdays[state.currentWeekday]}</Text>
-            <View style={styles.rightButtonContainer}>
-              <Icon.Button
-                name='chevron-right'
-                size={30}
-                backgroundColor={goodColor}
-                borderRadius={0}
-                onPress={() => this._nextDay()}
-              >
-              </Icon.Button>
-            </View>
-          </View>
-
-          <View style={styles.tableContainer}>
-            <Table borderStyle={{borderColor: '#fff', borderWidth: .2}}>
-              {
-                tableData.map((rowData, rowIndex) => (
-                  <TableWrapper key={rowIndex} style={styles.tableRow}>
-                    {
-                      rowData.map((cellData, columnIndex) => (
-                        <Cell
-                          key={columnIndex}
-                          data={element(cellData, rowIndex, columnIndex)}
-                          style={{padding: .2}}
-                        />
-                      ))
-                    }
-                  </TableWrapper>
-                ))
-              }
-            </Table>
-          </View>
-
-          <View style={styles.saveButtonContainer}>
-            <TouchableOpacity onPress={() => this._saveChanges()} style={styles.saveButton}>
-              <Text style={styles.saveButtonText}>
-                Сохранить изменения
-              </Text>
-            </TouchableOpacity>
+          <View style={{flex: .9, justifyContent: 'center'}}>
+            <Text style={styles.headerText}>Пожелание на день</Text>
           </View>
 
         </View>
-      </ScrollView>
+
+        <View style={styles.bodyContainer}>
+          <ScrollView showsVerticalScrollIndicator={false}>
+            <View style={styles.informationContainer}>
+              <Text style={styles.informationText}>
+                Красным помечены времена, когда вы не можете работать, а зеленым - когда можете. Нажмите на ячейку, чтобы изменить свои пожелания на день недели.
+              </Text>
+            </View>
+
+            <View style={styles.weekdayContainer}>
+              <View style={styles.leftButtonContainer}>
+                <Icon.Button
+                  name='chevron-left'
+                  size={30}
+                  backgroundColor={goodColor}
+                  borderRadius={0}
+                  onPress={() => this._prevDay()}
+                >
+                </Icon.Button>
+              </View>
+              <Text style={styles.weekdayText}>{weekdays[state.currentWeekday]}</Text>
+              <View style={styles.rightButtonContainer}>
+                <Icon.Button
+                  name='chevron-right'
+                  size={30}
+                  backgroundColor={goodColor}
+                  borderRadius={0}
+                  onPress={() => this._nextDay()}
+                >
+                </Icon.Button>
+              </View>
+            </View>
+
+            <View style={styles.tableContainer}>
+              <Table borderStyle={{borderColor: '#fff', borderWidth: .2}}>
+                {
+                  tableData.map((rowData, rowIndex) => (
+                    <TableWrapper key={rowIndex} style={styles.tableRow}>
+                      {
+                        rowData.map((cellData, columnIndex) => (
+                          <Cell
+                            key={columnIndex}
+                            data={element(cellData, rowIndex, columnIndex)}
+                            style={{padding: .2}}
+                          />
+                        ))
+                      }
+                    </TableWrapper>
+                  ))
+                }
+              </Table>
+            </View>
+
+            <View style={styles.saveButtonContainer}>
+              <TouchableOpacity onPress={() => this._saveChanges()} style={styles.saveButton}>
+                <Text style={styles.saveButtonText}>
+                  Сохранить изменения
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </ScrollView>
+        </View>
+
+      </View>
 		)
   }
 }
@@ -261,13 +258,16 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 20
   },
-  postHeaderContainer: {
+  bodyContainer: {
+    flex: 19
+  },
+  informationContainer: {
     padding: 20,
     borderBottomWidth: 1,
     borderBottomColor: '#d8d8d8',
     flexDirection: 'row'
   },
-  postHeaderText: {
+  informationText: {
     color: '#727272',
     flex: 1,
     flexWrap: 'wrap'

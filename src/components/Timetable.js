@@ -231,44 +231,43 @@ class Timetable extends React.Component {
     const state = this.state
 
     return (
-      <ScrollView showsVerticalScrollIndicator={false} stickyHeaderIndices={[0]}>
-        <View style={{backgroundColor: '#fff'}}>
+      <View style={{flex: 1}}>
+        <View style={styles.header}>
+          <TouchableOpacity style={{justifyContent: 'center', flex: .1}} onPress={() => this._openSideMenu()}>
+            <Icon name='menu' size={28} color={'#fff'}></Icon>
+          </TouchableOpacity>
 
-          <View style={styles.header}>
-
-            <TouchableOpacity style={{justifyContent: 'center', flex: .1}} onPress={() => this._openSideMenu()}>
-              <Icon name='menu' size={28} color={'#fff'}></Icon>
-            </TouchableOpacity>
-
-            <View style={{flex: .9, justifyContent: 'center'}}>
-              <Text style={styles.headerText}>Расписание</Text>
-            </View>
-
-          </View>
-
-          <GestureRecognizer
-            onSwipeLeft={() => this._onSwipeLeft()}
-            onSwipeRight={() => this._onSwipeRight()}
-          >
-            <View style={styles.calendar_month}>
-              <Text style={styles.calendar_month_text}>
-                {months[state.currentDate.month()]}, {state.currentDate.year()}
-              </Text>
-              <Text style={{color: tipColor, fontSize: 10}}>
-                Свайпните вправо, либо влево, чтобы изменить месяц.
-              </Text>
-            </View>
-          </GestureRecognizer>
-
-          <View style={styles.calendar_weekdays}>
-            {this.renderWeekDays()}
+          <View style={{flex: .9, justifyContent: 'center'}}>
+            <Text style={styles.headerText}>Расписание</Text>
           </View>
         </View>
 
-        <View style={styles.calendar_days}>
-          {this.renderDays()}
+        <View style={styles.bodyContainer}>
+          <ScrollView showsVerticalScrollIndicator={false}>
+            <GestureRecognizer
+              onSwipeLeft={() => this._onSwipeLeft()}
+              onSwipeRight={() => this._onSwipeRight()}
+            >
+              <View style={styles.calendar_month}>
+                <Text style={styles.calendar_month_text}>
+                  {months[state.currentDate.month()]}, {state.currentDate.year()}
+                </Text>
+                <Text style={{color: tipColor, fontSize: 10}}>
+                  Свайпните вправо, либо влево, чтобы изменить месяц.
+                </Text>
+              </View>
+            </GestureRecognizer>
+
+            <View style={styles.calendar_weekdays}>
+              {this.renderWeekDays()}
+            </View>
+        
+            <View style={styles.calendar_days}>
+              {this.renderDays()}
+            </View>
+          </ScrollView>
         </View>
-      </ScrollView>
+      </View>
     )
   }
 }
@@ -285,6 +284,9 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#fff',
     fontSize: 20
+  },
+  bodyContainer: {
+    flex: 19
   },
   calendar_month: {
     padding: 10,

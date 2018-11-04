@@ -13,6 +13,7 @@
     "moment": "^2.22.2",
     "react": "16.3.1",
     "react-native": "https://github.com/expo/react-native/archive/sdk-30.0.0.tar.gz",
+    "react-native-date-picker": "^2.1.1",
     "react-native-elements": "^0.19.1",
     "react-native-modal-datetime-picker": "^6.0.0",
     "react-native-swipe-gestures": "^1.0.2",

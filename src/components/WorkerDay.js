@@ -12,7 +12,8 @@ import apiUtils from '../network/apiUtils'
 import asyncStorage from '../storage/asyncStorage'
 import moment from 'moment'
 import Icon from 'react-native-vector-icons/MaterialIcons'
-import DateTimePicker from 'react-native-modal-datetime-picker'
+// import DateTimePicker from 'react-native-modal-datetime-picker'
+import DatePicker from 'react-native-date-picker'
 import HideableView from '../ui-components/HideableView'
 
 function renderIfElse(condition, trueContent, falseContent) {
@@ -56,7 +57,7 @@ export default class WorkerDay extends React.Component {
         'A': 'Отсутствие'
       },
       workerDay: null,
-      changeRequest: null
+      changeRequest: ''
     }
   }
 
@@ -105,7 +106,7 @@ export default class WorkerDay extends React.Component {
 
     apiUtils.sendRequest(URLS.url.getChangeRequest, 'GET', requestGetParams)
       .then(response => {
-        this.setState({ changeRequest: response.data })
+        this.setState({ changeRequest: response.data ? response.data : ''})
       })
       .catch(err => {
         alert(err)
@@ -182,7 +183,6 @@ export default class WorkerDay extends React.Component {
   render () {
     const state = this.state
     let weekdayNum = (moment(state.date, 'D.M.YYYY').weekday() + 6) % 7
-    
     let todayDate = moment()
     
     let workStartTime = moment(state.workStartTime, timeFormat)
@@ -192,14 +192,16 @@ export default class WorkerDay extends React.Component {
       todayDate.month(),
       todayDate.day(),
       workStartTime.hour(),
-      workStartTime.minute()
+      workStartTime.minute(),
+      workStartTime.second()
     )
     let workEndDateTime = new Date(
       todayDate.year(),
       todayDate.month(),
       todayDate.day(),
       workEndTime.hour(),
-      workEndTime.minute()
+      workEndTime.minute(),
+      workStartTime.second()
     )
     if (this._isMounted) {
       return (
@@ -267,16 +269,22 @@ export default class WorkerDay extends React.Component {
                     {state.workStartTime ? state.workStartTime.slice(0, -3): 'Не задано'}
                   </Text>
                 </TouchableOpacity>
-                <DateTimePicker
+                <DatePicker
+                  date={workStartDateTime}
+                  onDateChange={this._handleStartTimePicked}
+                  mode={'time'}
+                />
+                {/* <DateTimePicker
                   isVisible={state.isStartTimePickerVisible}
                   onConfirm={this._handleStartTimePicked}
-                  onCancel={this._hideStartTimePicker}      
+                  onCancel={this._hideStartTimePicker}
+                  is24Hour={true}    
                   mode='time'
                   date={workStartDateTime}
                   titleIOS='Выберите время'
                   confirmTextIOS='Подтвердить'
                   cancelTextIOS='Отменить'
-                />
+                /> */}
   
                 <TouchableOpacity onPress={this._showEndTimePicker}>
                   <Text style={{fontSize: 14}}>Время окончания</Text>
@@ -284,7 +292,7 @@ export default class WorkerDay extends React.Component {
                     {state.workEndTime ? state.workEndTime.slice(0, -3): 'Не задано'}
                   </Text>
                 </TouchableOpacity>
-                <DateTimePicker
+                {/* <DateTimePicker
                   isVisible={state.isEndTimePickerVisible}
                   onConfirm={this._handleEndTimePicked}
                   onCancel={this._hideEndTimePicker}
@@ -293,25 +301,25 @@ export default class WorkerDay extends React.Component {
                   titleIOS='Выберите время'
                   confirmTextIOS='Подтвердить'
                   cancelTextIOS='Отменить'
-                />
+                /> */}
               </View>
             </HideableView>
           </View>
-{/*   
+
           <View style={styles.changeRequestContainer}>
             {
               renderIfElse(
-                state.changeRequest && state.changeRequest.hasOwnProperty('status_type'),
+                state.changeRequest !== null && state.changeRequest.hasOwnProperty('status_type'),
                 <Text>
                   <Text style={styles.changeRequestText}>Вы уже запрашивал изменение графика на этот день. Статус запроса: </Text>
                   {
                     renderIfElse(
                       state.changeRequest.status_type === 'A',
-                      <Text style={[styles.changeRequestText, {color: 'green'}]}>одобрен</Text>,
+                      <Text style={[styles.changeRequestText, {color: goodColor}]}>одобрен</Text>,
                       renderIfElse(
                         state.changeRequest.status_type === 'D',
-                        <Text style={[styles.changeRequestText, {color: 'red'}]}>не одобрен</Text>,
-                        <Text style={[styles.changeRequestText, {color: 'yellow'}]}>на рассмотрении</Text>
+                        <Text style={[styles.changeRequestText, {color: dangerColor}]}>не одобрен</Text>,
+                        <Text style={[styles.changeRequestText, {color: '#fb9302'}]}>на рассмотрении</Text>
                       )
                     )
                   }
@@ -319,7 +327,7 @@ export default class WorkerDay extends React.Component {
                 null
               )
             }
-          </View> */}
+          </View>
   
           <View style={styles.saveButtonContainer}>
             <TouchableOpacity onPress={this._trySaveNewWorkerDay} style={styles.saveButton}>

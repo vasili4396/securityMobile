@@ -6,7 +6,8 @@ import {
   StyleSheet,
   TouchableOpacity,
   ActivityIndicator,
-  Alert
+  Alert,
+  RefreshControl
 } from 'react-native'
 import { ListItem } from 'react-native-elements'
 import Icon from 'react-native-vector-icons/MaterialIcons'
@@ -29,7 +30,6 @@ export default class Notifications extends React.Component {
     this.state = {
       notificationsCount: 20,
       isLoading: true,
-      refreshing: false,
       notifications: {}
     }
   }
@@ -78,9 +78,10 @@ export default class Notifications extends React.Component {
     })
       .then(() => {
         Alert.alert('', 'Изменения успешно сохранены.')
+        this.getNotifications()
       })
       .catch(err => {
-        Alert.alert('Ошибка', err)
+        Alert.alert('Ошибка', err.code)
       })
   }
 
@@ -110,7 +111,7 @@ export default class Notifications extends React.Component {
           </View>
         </View>
         
-        <View style={{flex: 19}}>
+        <View style={styles.bodyContainer}>
           {renderIfElse(
             !this.state.isLoading,
             <FlatList
@@ -118,6 +119,12 @@ export default class Notifications extends React.Component {
               containerStyle={{ borderTopWidth: 0, borderBottomWidth: 0 }}
               keyExtractor={item => String(item.id)}
               ItemSeparatorComponent={this.renderSeparator}
+              refreshControl={
+                <RefreshControl
+                  refreshing={this.state.isLoading}
+                  onRefresh={() => this.getNotifications()}
+                />
+              }
               renderItem={({item}) => (
                 <View>
                   <ListItem
@@ -174,6 +181,9 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#fff',
     fontSize: 20
+  },
+  bodyContainer: {
+    flex: 19
   },
   activityIndicatorContainer: {
     flex: 1,

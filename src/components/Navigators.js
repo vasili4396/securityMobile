@@ -1,4 +1,5 @@
 import React from 'react'
+import { StatusBar } from 'react-native'
 import { createSwitchNavigator } from 'react-navigation'
 import asyncStorage from './../storage/asyncStorage'
 import LoginScreen from './Login'
@@ -8,6 +9,7 @@ class AuthLoadingScreen extends React.Component {
   constructor(props) {
     super(props)
     this._getUserInfo()
+    // StatusBar.setBackgroundColor(primaryColor)
   }
 
   _getUserInfo () {

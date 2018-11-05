@@ -4,7 +4,8 @@ import {
   View,
   StyleSheet,
   TouchableOpacity,
-  ScrollView
+  ScrollView,
+  Alert
 } from 'react-native'
 import { Table, TableWrapper, Cell } from 'react-native-table-component'
 import Icon from 'react-native-vector-icons/MaterialIcons'
@@ -110,7 +111,7 @@ export default class Profile extends React.Component {
       constraint: JSON.stringify(aggregatedData)
     })
       .then(() => {
-        alert('Изменения были успешно сохранены.')
+        Alert.alert('', 'Изменения были успешно сохранены.')
       })
       .catch(err => {
         alert(err)

@@ -4,7 +4,9 @@ import {
   View,
   StyleSheet,
   TouchableOpacity,
-  ScrollView
+  ScrollView,
+  StatusBar,
+  SafeAreaView
 } from 'react-native'
 import apiUtils from '../network/apiUtils'
 import URLS from '../network/urls'
@@ -232,6 +234,10 @@ class Timetable extends React.Component {
 
     return (
       <View style={{flex: 1}}>
+        <StatusBar
+          barStyle="light-content"
+          backgroundColor="#6a51ae"
+        />
         <View style={styles.header}>
           <TouchableOpacity style={{justifyContent: 'center', flex: .1}} onPress={() => this._openSideMenu()}>
             <Icon name='menu' size={28} color={'#fff'}></Icon>

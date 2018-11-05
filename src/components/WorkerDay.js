@@ -12,8 +12,7 @@ import apiUtils from '../network/apiUtils'
 import asyncStorage from '../storage/asyncStorage'
 import moment from 'moment'
 import Icon from 'react-native-vector-icons/MaterialIcons'
-// import DateTimePicker from 'react-native-modal-datetime-picker'
-import DatePicker from 'react-native-date-picker'
+import DateTimePicker from 'react-native-modal-datetime-picker'
 import HideableView from '../ui-components/HideableView'
 
 function renderIfElse(condition, trueContent, falseContent) {
@@ -183,26 +182,7 @@ export default class WorkerDay extends React.Component {
   render () {
     const state = this.state
     let weekdayNum = (moment(state.date, 'D.M.YYYY').weekday() + 6) % 7
-    let todayDate = moment()
     
-    let workStartTime = moment(state.workStartTime, timeFormat)
-    let workEndTime = moment(state.workEndTime, timeFormat)
-    let workStartDateTime = new Date(
-      todayDate.year(),
-      todayDate.month(),
-      todayDate.day(),
-      workStartTime.hour(),
-      workStartTime.minute(),
-      workStartTime.second()
-    )
-    let workEndDateTime = new Date(
-      todayDate.year(),
-      todayDate.month(),
-      todayDate.day(),
-      workEndTime.hour(),
-      workEndTime.minute(),
-      workStartTime.second()
-    )
     if (this._isMounted) {
       return (
         <View style={{flex: 1}}>
@@ -269,22 +249,16 @@ export default class WorkerDay extends React.Component {
                     {state.workStartTime ? state.workStartTime.slice(0, -3): 'Не задано'}
                   </Text>
                 </TouchableOpacity>
-                <DatePicker
-                  date={workStartDateTime}
-                  onDateChange={this._handleStartTimePicked}
-                  mode={'time'}
-                />
-                {/* <DateTimePicker
+                <DateTimePicker
                   isVisible={state.isStartTimePickerVisible}
                   onConfirm={this._handleStartTimePicked}
                   onCancel={this._hideStartTimePicker}
                   is24Hour={true}    
                   mode='time'
-                  date={workStartDateTime}
                   titleIOS='Выберите время'
                   confirmTextIOS='Подтвердить'
                   cancelTextIOS='Отменить'
-                /> */}
+                />
   
                 <TouchableOpacity onPress={this._showEndTimePicker}>
                   <Text style={{fontSize: 14}}>Время окончания</Text>
@@ -292,16 +266,16 @@ export default class WorkerDay extends React.Component {
                     {state.workEndTime ? state.workEndTime.slice(0, -3): 'Не задано'}
                   </Text>
                 </TouchableOpacity>
-                {/* <DateTimePicker
+                <DateTimePicker
                   isVisible={state.isEndTimePickerVisible}
                   onConfirm={this._handleEndTimePicked}
                   onCancel={this._hideEndTimePicker}
-                  date={workEndDateTime}
+                  is24Hour={true}
                   mode='time'
                   titleIOS='Выберите время'
                   confirmTextIOS='Подтвердить'
                   cancelTextIOS='Отменить'
-                /> */}
+                />
               </View>
             </HideableView>
           </View>
@@ -318,7 +292,7 @@ export default class WorkerDay extends React.Component {
                       <Text style={[styles.changeRequestText, {color: goodColor}]}>одобрен</Text>,
                       renderIfElse(
                         state.changeRequest.status_type === 'D',
-                        <Text style={[styles.changeRequestText, {color: dangerColor}]}>не одобрен</Text>,
+                        <Text style={[styles.changeRequestText, {color: dangerColor}]}>отклонен</Text>,
                         <Text style={[styles.changeRequestText, {color: '#fb9302'}]}>на рассмотрении</Text>
                       )
                     )

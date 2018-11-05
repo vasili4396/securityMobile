@@ -53,7 +53,7 @@ export default class Notifications extends React.Component {
       .catch(error => {
         if (error.code === 401) {
           asyncStorage.clearStorage()
-          this.props.navigation.navigate('AuthLoading')
+          this.props.navigation.navigate('Auth')
         } else {
           alert(error)
         }
@@ -140,13 +140,13 @@ export default class Notifications extends React.Component {
                       <View style={styles.acceptDeclineContainer}>
                         <TouchableOpacity
                           style={[styles.acceptDeclineItem, {backgroundColor: dangerColor}]}
-                          onPress={() => this.tryHandleChangeRequest('D', item.object_id)}
+                          onPress={() => this.tryHandleChangeRequest('D', (item.object_id))}
                         >
                           <Text>Отклонить</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
                           style={[styles.acceptDeclineItem, {backgroundColor: goodColor}]}
-                          onPress={() => this.tryHandleChangeRequest('A', item.object_id)}
+                          onPress={() => this.tryHandleChangeRequest('A', (item.object_id))}
                         >
                           <Text>Одобрить</Text>
                         </TouchableOpacity>

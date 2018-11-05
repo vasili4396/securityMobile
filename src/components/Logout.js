@@ -13,7 +13,7 @@ export default class Logout extends React.Component {
 		apiUtils.sendRequest(URLS.url.logout, 'POST', {})
       .then(() => {
         asyncStorage.clearStorage()
-        this.props.navigation.navigate('AuthLoading')
+        this.props.navigation.navigate('Auth')
 			})
 			.catch(err => {
 				alert(err)

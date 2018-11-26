@@ -1,14 +1,14 @@
 {
   "expo": {
-    "name": "QoS mobile",
-    "description": "QoS mobile application.",
-    "slug": "qos-mobile-app",
+    "name": "crypto mobile",
+    "description": "crypto mobile.",
+    "slug": "crypto",
     "privacy": "public",
     "sdkVersion": "30.0.0",
     "platforms": ["ios", "android"],
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/qos_icon.png",
+    "icon": "./assets/logo.png",
     "updates": {
       "fallbackToCacheTimeout": 0
     },
@@ -16,7 +16,7 @@
       "**/*"
     ],
     "android": {
-      "package": "com.qos.mobileApp"
+      "package": "com.mipt.cryptoMobile"
     },
     "ios": {
       "supportsTablet": true

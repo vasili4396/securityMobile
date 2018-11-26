@@ -21,6 +21,9 @@ export default {
         return result;
       })
   },
+  async isSignedIn() {
+    return await AsyncStorage.getItem('user')
+  },
   async removeItem(key) {
     return await AsyncStorage.removeItem(key)
   },

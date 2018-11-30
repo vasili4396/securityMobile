@@ -9,6 +9,7 @@ import React, {Component} from 'react'
 import { createDrawerNavigator, NavigationActions } from 'react-navigation'
 import SecondTask from './SecondTask'
 import FourthTask from './FourthTask'
+import Eliptic from './Eliptic'
 
 const screenWidth = 0.8 * Dimensions.get('screen').width
 
@@ -46,6 +47,7 @@ class SideMenu extends Component {
 			<View style={styles.navigationMenuContainer}>				
 				{this.renderMenuItem('SecondTask', '2. КСГПСЧ')}
 				{this.renderMenuItem('FourthTask', '4. Псевдопростые числа')}
+				{this.renderMenuItem('Eliptic', 'Эллиптические кривые')}
 			</View>
 
 		</View>
@@ -77,6 +79,9 @@ const styles = StyleSheet.create({
 
 export default createDrawerNavigator(
 	{
+		Eliptic: {
+			screen: Eliptic
+		},
 		SecondTask: {
 			screen: SecondTask
 		},

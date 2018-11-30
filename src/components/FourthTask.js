@@ -22,7 +22,7 @@ function renderIfElse(condition, trueContent, falseContent) {
   }
 }
 
-export default class WorkerDay extends React.Component {
+export default class FourthTask extends React.Component {
   constructor(props) {
     super(props)
     this.state = {

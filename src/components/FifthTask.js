@@ -4,7 +4,8 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
-  ScrollView
+  ScrollView,
+  Alert
 } from 'react-native'
 import Button from './Button'
 import ApiUtils from '../network/apiUtils'
@@ -22,22 +23,22 @@ function renderIfElse(condition, trueContent, falseContent) {
   }
 }
 
-export default class FourthTask extends React.Component {
+export default class FifthTask extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
       res: {},
-      l: '',
-      n: ''
+      n: '',
+      e: '',
+      c: ''
     }
   }
 
   getAnswer () {
-    let lList = this.state.l.split(' ').join('').split(',').map(Number)
-    
-    ApiUtils.sendRequest(URLS.fourthTask, 'GET', {
-      l: JSON.stringify(lList),
-      n: Number(this.state.n)
+    ApiUtils.sendRequest(URLS.fifthTask, 'get', {
+      n: Number(this.state.n),
+      e: Number(this.state.e),
+      c: Number(this.state.c)
     })
       .then(response => {
         this.setState({res: response.data })
@@ -50,11 +51,10 @@ export default class FourthTask extends React.Component {
 
   render () {
     const state = this.state
-    // if (state.res.hasOwnProperty('ans')) {
-    //   for (ans in state.res.ans) {
-    //     console.log(ans)
-    //   }
-    // } 
+    let answers = ''
+    if (state.res.hasOwnProperty('ans')) {
+      answers = state.res.ans.split(',')
+    }
     return (
       <View style={{flex: 1}}>
         <View style={styles.header}>
@@ -63,26 +63,33 @@ export default class FourthTask extends React.Component {
           </TouchableOpacity>
 
           <View style={{flex: .9, justifyContent: 'center'}}>
-            <Text style={styles.headerText}>Псевдопростые числа</Text>
+            <Text style={styles.headerText}>RSA(расшифровка)</Text>
           </View>
         </View>
 
         <View style={styles.bodyContainer}>
           <ScrollView style={{flex: 1}}>
-            <Example exampleText='Проверить, являются ли числа 74, 448, 640, 660, 719 свидетелями простоты числа 793 по Миллеру.'/>
-            
+            <Example exampleText='Расшифровать сообщение по схеме RSA. Открытая экспонента: e = 91, ключ: n=77. Зашифрованное сообщение: c = 196.' >
+            </Example>
             <View style={styles.textInputContainer}>
-              <Text>Введите числа, которые проверить</Text>
+              <Text>Введите открытый ключ</Text>
               <TextInputForm
-                placeholder='Например: 74, 448, 640, 660, 719'
-                onChangeText={ (l) => this.setState({l})}
+                placeholder='n'
+                onChangeText={ (n) => this.setState({n})}
                 placeholderTextColor='#000'
                 borderBottomColor='#000'
               />
-              <Text style={{paddingTop: 20}}>Введите число, по которому проверять простоту</Text>
+              <Text>Введите открытую экспоненту</Text>
               <TextInputForm
-                placeholder='Например: 793'
-                onChangeText={ (n) => this.setState({n})}
+                placeholder='е'
+                onChangeText={ (e) => this.setState({e})}
+                placeholderTextColor='#000'
+                borderBottomColor='#000'
+              />
+              <Text>Введите зашифрованное сообщение</Text>
+              <TextInputForm
+                placeholder='c'
+                onChangeText={ (c) => this.setState({c})}
                 placeholderTextColor='#000'
                 borderBottomColor='#000'
               />
@@ -92,11 +99,11 @@ export default class FourthTask extends React.Component {
 						  <Button buttonText='Решить задачу' onPress={() => this.getAnswer()} color='#000'/>
 					  </View>
 
-            <View style={{flex: 2}}>
+            <View style={{flex: 2, marginBottom: 10}}>
               {renderIfElse(
                 state.res.hasOwnProperty('ans'), 
                 <View>
-                  <Result results={state.res.ans} between={state.res.between} />
+                  <Result results={answers} between={state.res.between} />
                 </View>
                 ,
                 null

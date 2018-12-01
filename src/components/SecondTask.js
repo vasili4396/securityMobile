@@ -63,7 +63,7 @@ export default class SecondTask extends React.Component {
           </TouchableOpacity>
 
           <View style={{flex: .9, justifyContent: 'center'}}>
-            <Text style={styles.headerText}>КСГПСЧ и потоковые шифры</Text>
+            <Text style={styles.headerText}>КСГПСЧ</Text>
           </View>
         </View>
 

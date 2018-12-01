@@ -26,9 +26,9 @@ export default class TaskSelection extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      a: 1,//this.props.navigation.state.params.a,
-      b: 2,//this.props.navigation.state.params.b,
-      q: 47,//this.props.navigation.state.params.q
+      a: this.props.navigation.state.params.a,
+      b: this.props.navigation.state.params.b,
+      q: this.props.navigation.state.params.q,
       x: '',
       y: '',
       n: '',
@@ -68,7 +68,7 @@ export default class TaskSelection extends React.Component {
   solve () {
     const state = this.state
     if (state.taskID === 1 && !state.n) {
-      Alert.alert('', 'Введите n')
+      Alert.alert('Error', 'n required')
       this.clearValues()
       return null
     } 
@@ -114,10 +114,13 @@ export default class TaskSelection extends React.Component {
 
 
   render () {
-    let equation = `y^2 = x^3 + ${this.state.a} * x + ${this.state.b}`
+    let equation = `y^2 = x^3 + ${this.state.a > 0 ? this.state.a : `(${this.state.a})`} * x + ${this.state.b > 0 ? this.state.b : `(${this.state.b})`}`
 
     function severalResults (results) {
       let res = []
+      if (results.indexOf('(') === 0) {
+        results = [results]
+      }
       for (result of results) {
         res.push(
           <Text>{result + ', '}</Text>
@@ -134,7 +137,6 @@ export default class TaskSelection extends React.Component {
             <View style={{alignItems: 'center'}}>
               <Text style={{fontWeight: 'bold'}}>Ответ</Text>
               {severalResults(this.state.answer)}
-              {/* <Text>{this.state.answer}</Text> */}
             </View>
             ,
             null

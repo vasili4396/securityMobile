@@ -24,7 +24,8 @@ class ElipticSetParams extends React.Component {
   }
 
   isAbleToContinue () {
-    if (this.state.a && this.state.b && this.state.q) {
+    console.log(this.state.q, typeof(this.state.q))
+    if (typeof(this.state.a) === 'number' && typeof(this.state.b) === 'number' && typeof(this.state.q) === 'number') {
       this.props.navigation.navigate('taskSelectionPage', {
         a: this.state.a,
         b: this.state.b,
@@ -72,7 +73,7 @@ class ElipticSetParams extends React.Component {
               <Text style={{paddingTop: 20, fontWeight: 'bold' }}>Введите основание поля</Text>
               <TextInputForm
                 placeholder='Целое простое число'
-                onChangeText={ (q) => this.setState({q})}
+                onChangeText={ (q) => this.setState({q: Number(q)})}
                 placeholderTextColor='#000'
                 borderBottomColor='#000'
               />
@@ -125,16 +126,16 @@ const styles = StyleSheet.create({
 
 export default elipticStackNavigator = createStackNavigator(
   {
-    taskSelectionPage: {
-      screen: TaskSelection,
-      navigationOptions: {
-        title: 'Выберите задачу'
-      }
-    },
     setParamsPage: {
       screen: ElipticSetParams,
       navigationOptions: {
         header: null
+      }
+    },
+    taskSelectionPage: {
+      screen: TaskSelection,
+      navigationOptions: {
+        title: 'Выберите задачу'
       }
     },
     initialRouteName: 'setParamsPage'
